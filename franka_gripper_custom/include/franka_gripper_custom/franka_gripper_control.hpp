@@ -8,7 +8,6 @@
 #include <custom_msgs/msg/gripper_width.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
-#include <std_msgs/msg/float64.hpp>  // message type for gripper width command
 
 class GripperSubscriber : public rclcpp::Node {
  public:
@@ -29,7 +28,7 @@ class GripperSubscriber : public rclcpp::Node {
   bool command_data_bool_prev;
 
   // ROS2 subscription
-  rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr command_sub_;
+  rclcpp::Subscription<custom_msgs::msg::GripperWidth>::SharedPtr command_sub_;
 
   // ROS2 publishers
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;
@@ -50,6 +49,6 @@ class GripperSubscriber : public rclcpp::Node {
   int pub_frequency_;
 
   // Callback function executed when a message is received
-  void commandCallback(const std_msgs::msg::Float64::SharedPtr msg);
+  void commandCallback(const custom_msgs::msg::GripperWidth::SharedPtr msg);
   void publishGripperState();
 };

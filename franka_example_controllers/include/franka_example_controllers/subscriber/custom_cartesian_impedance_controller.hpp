@@ -62,6 +62,7 @@ class CustomCartesianImpedanceController : public controller_interface::Controll
   Vector7d dq_;
   Vector7d tau_J_d_;
   Vector6d f_ext_cart_;
+  Vector6d f_ext_cart_prev;
 
   double filter_params_{0.008};
   const double delta_tau_max_{0.5};

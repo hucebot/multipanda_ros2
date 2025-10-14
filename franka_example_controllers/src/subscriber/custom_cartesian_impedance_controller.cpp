@@ -93,7 +93,10 @@ controller_interface::return_type CustomCartesianImpedanceController::update(
   pseudoInverse(jacobian_n.transpose(), jacobian_n_transpose_pinv);
   // compute end-effector external force
   // coriolis already includes qdot, while tau_J_d already includes gravity
-  f_ext_cart_ = jacobian_n_transpose_pinv * (coriolis - tau_J_d);
+  Vector6d f_ext_cart_est = jacobian_n_transpose_pinv * (coriolis - tau_J_d);
+  // filter force
+  f_ext_cart_ = filter_params_ * f_ext_cart_est + (1.0 - filter_params_) * f_ext_cart_;
+  f_ext_cart_prev = f_ext_cart_;
 
   // position error
   error_.head(3) << current_position - position_d_;
@@ -231,6 +234,8 @@ CallbackReturn CustomCartesianImpedanceController::on_activate(
   orientation_d_ = Quaterniond(init_pose_matrix_.block<3, 3>(0, 0));
   orientation_d_target_ = orientation_d_;
   q_d_nullspace_ = Vector7d(franka_robot_model_->getRobotState()->q.data());
+
+  f_ext_cart_prev.setZero();
 
   stiffness_.setIdentity();
   stiffness_.topLeftCorner(3, 3) << pos_stiff_ * Matrix3d::Identity();

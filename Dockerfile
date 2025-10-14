@@ -136,6 +136,9 @@ RUN cd /home/user/humble_ws/src && git clone https://github.com/tenfoldpaper/muj
 # Checkout the specific branch for ROS 2 Humble
 RUN cd /home/user/humble_ws/src/mujoco_ros_pkgs && git checkout wip_ros_control_humble
 
+# Clone custom_msgs
+RUN cd /home/user/humble_ws/src && git clone https://github.com/hucebot/franka_custom_msgs.git
+
 RUN chown -R user:user /home/user/
 # Do rosdep install and then build the packages
 USER user

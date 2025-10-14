@@ -33,7 +33,7 @@ GripperSubscriber::GripperSubscriber() : Node("panda_gripper") {
   }
 
   // Subscriber
-  command_sub_ = this->create_subscription<std_msgs::msg::Float64>(
+  command_sub_ = this->create_subscription<custom_msgs::msg::GripperWidth>(
       "~/gripper_command", 1,
       std::bind(&GripperSubscriber::commandCallback, this, std::placeholders::_1));
 
@@ -53,9 +53,9 @@ GripperSubscriber::GripperSubscriber() : Node("panda_gripper") {
   command_data_bool_prev = false;
 }
 
-void GripperSubscriber::commandCallback(const std_msgs::msg::Float64::SharedPtr msg) {
+void GripperSubscriber::commandCallback(const custom_msgs::msg::GripperWidth::SharedPtr msg) {
   // get data
-  double command_data = msg->data;
+  double command_data = msg->width;
   bool command_data_bool = (command_data >= 0.5);
 
   // decide whether to open or close

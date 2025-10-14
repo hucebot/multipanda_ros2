@@ -27,4 +27,3 @@ services:
       - ./franka_simple_publishers:/home/user/humble_ws/src/bimanual_architecture/franka_simple_publishers
       - ./franka_description:/home/user/humble_ws/src/bimanual_architecture/franka_description
       - ./franka_gripper_custom:/home/user/humble_ws/src/bimanual_architecture/franka_gripper_custom
-      - ./custom_msgs:/home/user/humble_ws/src/bimanual_architecture/custom_msgs
