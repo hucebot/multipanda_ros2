@@ -61,6 +61,7 @@ class CustomCartesianImpedanceController : public controller_interface::Controll
   Vector7d q_;
   Vector7d dq_;
   Vector7d tau_J_d_;
+  Vector6d f_ext_cart_;
 
   double filter_params_{0.008};
   const double delta_tau_max_{0.5};
@@ -97,6 +98,7 @@ class CustomCartesianImpedanceController : public controller_interface::Controll
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_pos_pub_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_vel_pub_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_torques_pub_;
+  rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr f_ext_cart_pub_;
 };
 
 }  // namespace franka_example_controllers

@@ -129,7 +129,7 @@ def generate_launch_description():
         ),
         DeclareLaunchArgument(
             pub_frequency_name,
-            default_value="50",
+            default_value="90",
             description='Publisher frequency to publish data for collection.'
         ),
         Node(

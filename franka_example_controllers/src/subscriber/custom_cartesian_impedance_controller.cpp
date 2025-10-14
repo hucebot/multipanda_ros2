@@ -7,6 +7,19 @@
 #include <exception>
 #include <string>
 
+// homing pose to start teleoperation
+//
+// pose:
+//   position:
+//     x: 0.35
+//     y: -0.05
+//     z: 0.5
+//   orientation:
+//     x: 0.999802830692603
+//     y: -0.004300181336669291
+//     z: 0.0021556205808609856
+//     w: -0.0192655516256672
+
 inline void pseudoInverse(const Eigen::MatrixXd& M_, Eigen::MatrixXd& M_pinv_, bool damped = true) {
   double lambda_ = damped ? 0.2 : 0.0;
 
@@ -69,6 +82,18 @@ controller_interface::return_type CustomCartesianImpedanceController::update(
   q_ = q;
   dq_ = dq;
   tau_J_d_ = tau_J_d;
+
+  // get gravity vector
+  Eigen::Map<const Vector7d> gravity(franka_robot_model_->getGravityForceVector().data());
+  // compute jacobian in n-frame
+  Eigen::Matrix<double, 6, 7> jacobian_n(
+      franka_robot_model_->getBodyJacobian(franka::Frame::kEndEffector).data());
+  // compute its pseudo-inverse
+  Eigen::MatrixXd jacobian_n_transpose_pinv;
+  pseudoInverse(jacobian_n.transpose(), jacobian_n_transpose_pinv);
+  // compute end-effector external force
+  // coriolis already includes qdot, while tau_J_d already includes gravity
+  f_ext_cart_ = jacobian_n_transpose_pinv * (coriolis - tau_J_d);
 
   // position error
   error_.head(3) << current_position - position_d_;
@@ -150,7 +175,7 @@ CallbackReturn CustomCartesianImpedanceController::on_init() {
     auto_declare<double>("rotational_clip", 0.8);
     auto_declare<double>("translational_Ki", 15);
     auto_declare<double>("rotational_Ki", 1);
-    auto_declare<double>("pub_frequency", 20.0);
+    auto_declare<double>("pub_frequency", 90.0);
 
     sub_eq_pose_ = get_node()->create_subscription<geometry_msgs::msg::PoseStamped>(
         "/cartesian_impedance/equilibrium_pose", 1,
@@ -166,6 +191,8 @@ CallbackReturn CustomCartesianImpedanceController::on_init() {
         "/cartesian_impedance/joint_vel", 10);
     joint_torques_pub_ = get_node()->create_publisher<sensor_msgs::msg::JointState>(
         "/cartesian_impedance/joint_torques", 10);
+    f_ext_cart_pub_ = get_node()->create_publisher<sensor_msgs::msg::JointState>(
+        "/cartesian_impedance/f_ext_cart", 10);
 
   } catch (const std::exception& e) {
     fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
@@ -277,12 +304,14 @@ void CustomCartesianImpedanceController::publishData() {
   sensor_msgs::msg::JointState msgJointPos;
   sensor_msgs::msg::JointState msgJointVel;
   sensor_msgs::msg::JointState msgJointTorques;
+  sensor_msgs::msg::JointState msgForceExtCart;
 
   msgCartPosDesFilt.header.stamp = get_node()->now();
   msgCartPosCurr.header.stamp = get_node()->now();
   msgJointPos.header.stamp = get_node()->now();
   msgJointVel.header.stamp = get_node()->now();
   msgJointTorques.header.stamp = get_node()->now();
+  msgForceExtCart.header.stamp = get_node()->now();
 
   // Cartesian target pose filtered
   msgCartPosDesFilt.pose.position.x = position_d_(0);
@@ -293,7 +322,7 @@ void CustomCartesianImpedanceController::publishData() {
   msgCartPosDesFilt.pose.orientation.z = orientation_d_.z();
   msgCartPosDesFilt.pose.orientation.w = orientation_d_.w();
 
-  // Cartesian current pose  --> NO GLOBAL
+  // Cartesian current pose
   msgCartPosCurr.pose.position.x = current_position_(0);
   msgCartPosCurr.pose.position.y = current_position_(1);
   msgCartPosCurr.pose.position.z = current_position_(2);
@@ -315,9 +344,17 @@ void CustomCartesianImpedanceController::publishData() {
   }
 
   // torques
+  msgJointTorques.name = {"T1", "T2", "T3", "T4", "T5", "T6", "T7"};
   msgJointTorques.effort.resize(num_joints_);
   for (int i = 0; i < num_joints_; ++i) {
     msgJointTorques.effort[i] = tau_J_d_[i];
+  }
+
+  // end-effector external force
+  msgForceExtCart.name = {"Fx", "Fy", "Fz", "Tx", "Ty", "Tz"};
+  msgForceExtCart.effort.resize(6);
+  for (int i = 0; i < num_joints_; ++i) {
+    msgForceExtCart.effort[i] = f_ext_cart_[i];
   }
 
   cartesian_pos_des_filt_pub_->publish(msgCartPosDesFilt);
@@ -325,6 +362,7 @@ void CustomCartesianImpedanceController::publishData() {
   joint_pos_pub_->publish(msgJointPos);
   joint_vel_pub_->publish(msgJointVel);
   joint_torques_pub_->publish(msgJointTorques);
+  f_ext_cart_pub_->publish(msgForceExtCart);
 }
 
 }  // namespace franka_example_controllers

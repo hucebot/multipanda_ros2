@@ -5,6 +5,7 @@
 
 #include <franka/exception.h>
 #include <franka/gripper.h>
+#include <custom_msgs/msg/gripper_width.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <std_msgs/msg/float64.hpp>  // message type for gripper width command
@@ -32,7 +33,7 @@ class GripperSubscriber : public rclcpp::Node {
 
   // ROS2 publishers
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;
-  rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr width_pub_;
+  rclcpp::Publisher<custom_msgs::msg::GripperWidth>::SharedPtr width_pub_;
 
   // Timer for periodic state publishing
   rclcpp::TimerBase::SharedPtr timer_;

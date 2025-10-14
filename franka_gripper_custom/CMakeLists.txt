@@ -13,6 +13,7 @@ find_package(std_msgs REQUIRED)
 find_package(control_msgs REQUIRED)
 find_package(franka_msgs REQUIRED)
 find_package(Franka REQUIRED)  
+find_package(custom_msgs REQUIRED)
 
 # --- Executable node ---
 add_executable(franka_gripper_control src/franka_gripper_control.cpp)
@@ -27,7 +28,8 @@ ament_target_dependencies(franka_gripper_control
   std_msgs
   control_msgs
   franka_msgs
-  Franka)
+  Franka
+  custom_msgs)
 
 target_link_libraries(franka_gripper_control Franka::Franka)
 

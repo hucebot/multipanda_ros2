@@ -40,7 +40,8 @@ GripperSubscriber::GripperSubscriber() : Node("panda_gripper") {
   // Publishers
   joint_state_pub_ =
       this->create_publisher<sensor_msgs::msg::JointState>("~/joint_states", 10);  // joint states
-  width_pub_ = this->create_publisher<std_msgs::msg::Float64>("~/width", 10);      // gripper width
+  width_pub_ =
+      this->create_publisher<custom_msgs::msg::GripperWidth>("~/width", 10);  // gripper width
 
   // Timer for publishing state
   timer_ = this->create_wall_timer(std::chrono::milliseconds(1000 / pub_frequency_),
@@ -103,8 +104,9 @@ void GripperSubscriber::publishGripperState() {
   joint_state_pub_->publish(joint_states);
 
   // Publish width
-  std_msgs::msg::Float64 width_msg;
-  width_msg.data = current_gripper_state_.width;
+  custom_msgs::msg::GripperWidth width_msg;
+  width_msg.header.stamp = this->get_clock()->now();
+  width_msg.width = current_gripper_state_.width;
   width_pub_->publish(width_msg);
 }
 
