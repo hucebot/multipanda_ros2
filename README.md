@@ -175,6 +175,13 @@ bash docker_access.sh
 
 The `docker-compose.yaml` is set-up to mount inside the Docker some of the packages. This allows you to directly test your changes without re-building the Docker image.
 
+### Starting up the Franka
+- go the web GUI (prefer chromium) and unlock the joints (button)
+- gui>activate_FCI > press the dead-man button (midway)
+- then you can start the controller (see below)
+- if problems with gripper: settings>end-effetor>homing
+- shutdown: shutdown in the app first (then use the emergency stop)
+  
 ### Run the `custom_cartesian_impedance_controller`
 
 The `custom_cartesian_impedance_controller` allows to control the EE equilibrium pose by publishing over the topic `/cartesian_impedance/equilibrium_pose` (`geometry_msgs.msg.PoseStamped`). For example, this is what is done by the interactive marker in Rviz.
@@ -185,6 +192,12 @@ To launch the controller
 ```bash
 ros2 launch franka_bringup franka_cartesian_impedance.launch.py robot_ip:=176.16.0.1 use_interactive_marker:=true use_rviz:=true raise_collision_thresholds:=false
 ```
+
+To launch the controller *WITH THE GRIPPER topic*
+```bash
+ros2 launch franka_bringup franka_cartesian_impedance_gripper.launch.py robot_ip:=176.16.0.1 use_interactive_marker:=true use_rviz:=true raise_collision_thresholds:=false
+```
+
 
 Other possibly useful arguments are:
 - `use_rviz` (default: True)
