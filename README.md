@@ -81,21 +81,19 @@ On a computer running Ubuntu 22.04 and real-time kernel (if you wish to use it w
 3. Build MuJoCo **3.2.0** (required by `mujoco_ros_pkg`) from source by following the [instructions][mujoco-instructions].
 4. Install `mujoco_ros_pkg`, specifically [this fork](https://github.com/tenfoldpaper/mujoco_ros_pkgs).
 6. Clone this repository (i.e. the multipanda) into your workspace's `src` folder.
-7. Install the dependencies by running this rosdep command from the workspace root:
-
-    `rosdep install --from-paths src -y --ignore-src`
-7. Export the `{mujoco/libfranka}/lib/cmake` directories as a `CMAKE_PREFIX_PATH` in your environment, i.e.
+7. Install the dependencies by running this rosdep command from the workspace root: `rosdep install --from-paths src -y --ignore-src`
+1. Export the `{mujoco/libfranka}/lib/cmake` directories as a `CMAKE_PREFIX_PATH` in your environment, i.e.
     * in `~/.bashrc`, `export CMAKE_PREFIX_PATH={path to mujoco installation}/lib/cmake:{path to libfranka installation}/lib/cmake`
-8. Add the build path to your `LD_LIBRARY_PATH` by adding the following line to your `~/.bashrc`:
+2. Add the build path to your `LD_LIBRARY_PATH` by adding the following line to your `~/.bashrc`:
 
     `export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:{path to libfranka install}/lib:{path to mujoco's install}/lib`
-9. Source the workspace, then in your workspace root, call:
+3. Source the workspace, then in your workspace root, call:
 
     `colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release`
     * The paths to mujoco and libfranka are added to `CMAKE_PREFIX_PATH`, so no separate args are needed.
     * The MuJoCo path is the INSTALLED folder's directory. The `lib` folder should only have the two `.so` files, and a folder called `cmake`.
     * Likewise, the `libfranka` path should contain the `cmake` folder and the `.so` files.
-10. To run:
+4.  To run:
     * Single arm:
         1. with real robot, source the workspace, and run:
             * Default: `ros2 launch franka_bringup franka.launch.py robot_ip:=<fci-ip>`.
@@ -118,10 +116,10 @@ On a computer running Ubuntu 22.04 and real-time kernel (if you wish to use it w
 ## Usage with Docker
 
 1. Build the docker image:
-        * at the root of the repository (where `Dockerfile` is located), run `bash docker_build.sh`.
+    * at the root of the repository (where `Dockerfile` is located), run `bash docker_build.sh`.
 2. Start the docker container with `docker compose` via `bash docker_start.sh`:
-        *`xhost +` is needed to give the Docker container access to the host's screen.
-        * The `docker-compose.yml` file defines configurations that allow the container to run on the realtime kernel of the host, assuming that the host has one. The instructions were found in [here](https://github.com/2b-t/docker-realtime?tab=readme-ov-file).
+    * `xhost +` is needed to give the Docker container access to the host's screen.
+    * The `docker-compose.yml` file defines configurations that allow the container to run on the realtime kernel of the host, assuming that the host has one. The instructions were found in [here](https://github.com/2b-t/docker-realtime?tab=readme-ov-file).
 3. Access the container with `bash docker_access.sh`.
 4. (OPTIONAL) Check that the connection to the robot, RT kernel and screen are all working fine.
     * You can check if docker is properly linked to your screen by running:
@@ -163,12 +161,12 @@ Shutting down procedure
 The `custom_cartesian_impedance_controller` (inside the pkg `franka_example_controllers`) allows to control the EE equilibrium pose by publishing over the topic `/cartesian_impedance/equilibrium_pose` (`geometry_msgs.msg.PoseStamped`). For example, this is what is done by the interactive marker in Rviz.
 
 To use it:
-    - `ros2 launch franka_bringup franka_cartesian_impedance_gripper_topic.launch.py robot_ip:=176.16.0.1 use_interactive_marker:=true use_rviz:=true raise_collision_thresholds:=true`.
-    - Through the interactive marker in *Rviz2* is it possible to control the equilibrium pose of the cartesian impedance controller.
-    - Right-clicking the marker opens a menu through which is it possible to:
-        - *Reset Marker*
-        - *Grasp*
-        - *Open*
+* `ros2 launch franka_bringup franka_cartesian_impedance_gripper_topic.launch.py robot_ip:=176.16.0.1 use_interactive_marker:=true use_rviz:=true raise_collision_thresholds:=true`.
+* Through the interactive marker in *Rviz2* is it possible to control the equilibrium pose of the cartesian impedance controller.
+* Right-clicking the marker opens a menu through which is it possible to:
+    * *Reset Marker*
+    * *Grasp*
+    * *Open*
 
 With `raise_collision_thresholds:=true` the safety threholds for the emergency collision stop. This eanbles a more extreme compliant behaviour, use with caution.
 

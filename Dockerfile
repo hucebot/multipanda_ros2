@@ -64,6 +64,7 @@ RUN apt-get update -y && apt-get install -y --allow-unauthenticated \
     ros-humble-rqt-controller-manager \
     ros-humble-sensor-msgs \
     ros-humble-tf-transformations \
+    ros-humble-rmw-cyclonedds-cpp \
     ros-humble-plotjuggler-ros \
     && rm -rf /var/lib/apt/lists/*
 
@@ -149,11 +150,11 @@ USER user
 WORKDIR /home/user/
 SHELL ["/bin/bash", "-c"]
 
-# Suppresss the XDG errors when running GUI apps like RVIZ
-RUN mkdir /tmp/${UID}
-RUN chown -R user:user /tmp/${UID}
+# Suppress the XDG errors when running GUI apps like RVIZ
+RUN mkdir /tmp/${USER_UID}
+RUN chown -R user:user /tmp/${USER_UID}
+ENV XDG_RUNTIME_DIR=/tmp/${USER_UID}
 
-ENV XDG_RUNTIME_DIR=/tmp/${UID}
 ENV CMAKE_PREFIX_PATH=/home/user/Libraries/libfranka/lib/cmake:/home/user/Libraries/mujoco/lib/cmake
 RUN cd /home/user/humble_ws \
     && source /home/user/.bashrc \
@@ -161,5 +162,6 @@ RUN cd /home/user/humble_ws \
     && colcon build --cmake-args -DCMAKE_BUILD_TYPE=Release
 
 RUN echo 'source /home/user/humble_ws/install/setup.bash' >> /home/user/.bashrc
+RUN echo 'export RMW_IMPLEMENTATION=rmw_cyclonedds_cpp' >> /home/user/.bashrc
 
 WORKDIR /home/user/humble_ws
