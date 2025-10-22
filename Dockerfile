@@ -132,7 +132,7 @@ RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/Libraries/libfranka
 RUN echo 'export CMAKE_PREFIX_PATH=/home/user/Libraries/libfranka/lib/cmake:/home/user/Libraries/mujoco/lib/cmake' >> /home/user/.bashrc
 
 # Clone mujoco_ros_pkgs
-RUN cd /home/user/humble_ws/src && git clone https://github.com/tenfoldpaper/mujoco_ros_pkgs.git
+RUN cd /home/user/humble_ws/src && git clone https://github.com/hucebot/mujoco_ros_pkgs.git
 # Checkout the specific branch for ROS 2 Humble
 RUN cd /home/user/humble_ws/src/mujoco_ros_pkgs && git checkout wip_ros_control_humble
 
