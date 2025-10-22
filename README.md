@@ -148,7 +148,7 @@ Shutting down procedure
 The `custom_cartesian_impedance_controller` (inside the pkg `franka_example_controllers`) allows to control the EE equilibrium pose by publishing over the topic `/cartesian_impedance/equilibrium_pose` (`geometry_msgs.msg.PoseStamped`). For example, this is what is done by the interactive marker in Rviz.
 
 To use it:
-    - `ros2 launch franka_bringup franka_cartesian_impedance.launch.py robot_ip:=176.16.0.1 use_interactive_marker:=true use_rviz:=true raise_collision_thresholds:=true`.
+    - `ros2 launch franka_bringup franka_cartesian_impedance_gripper_topic.launch.py robot_ip:=176.16.0.1 use_interactive_marker:=true use_rviz:=true raise_collision_thresholds:=true`.
     - Through the interactive marker in *Rviz2* is it possible to control the equilibrium pose of the cartesian impedance controller.
     - Right-clicking the marker opens a menu through which is it possible to:
         - *Reset Marker*

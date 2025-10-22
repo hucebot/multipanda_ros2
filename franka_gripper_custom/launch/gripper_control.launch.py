@@ -41,7 +41,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "maximum_gripper_width",
-                default_value="0.076",
+                default_value="0.074",
                 description="Maximum gripper width opening in meters.",
             ),
             DeclareLaunchArgument(
@@ -51,7 +51,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 "default_gripper_speed",
-                default_value="1.0",
+                default_value="0.1",
                 description="Default speed for gripper motion in m/s.",
             ),
             DeclareLaunchArgument(

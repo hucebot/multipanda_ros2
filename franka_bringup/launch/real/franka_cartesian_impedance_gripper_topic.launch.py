@@ -157,7 +157,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 gripper_max_width_parameter_name,
-                default_value="0.076",
+                default_value="0.074",
                 description="Maximum gripper width opening in meters.",
             ),
             DeclareLaunchArgument(
@@ -167,7 +167,7 @@ def generate_launch_description():
             ),
             DeclareLaunchArgument(
                 default_gripper_speed_parameter_name,
-                default_value="1.0",
+                default_value="0.1",
                 description="Default speed for gripper motion in m/s.",
             ),
             DeclareLaunchArgument(
@@ -259,11 +259,13 @@ def generate_launch_description():
             ),
             Node(
                 package="franka_simple_publishers",
-                executable="simple_interactive_marker_pose_publisher",
-                name="simple_interactive_marker_pose_publisher",
+                executable="interactive_marker_pose_publisher_gripper_topic",
+                name="interactive_marker_pose_publisher_gripper_topic",
                 arguments=[
-                    "--topic_name",
+                    "--eq_pose_topic_name",
                     "cartesian_impedance/equilibrium_pose",
+                    "--gripper_topic_name",
+                    "panda_gripper/gripper_command",
                     "--base_link",
                     "panda_link0",
                     "--ee_link",
