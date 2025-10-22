@@ -204,7 +204,9 @@ colcon build --packages-select <desired-package-name>
 
 The original version is forked from mcbed's port of franka_ros2 for [humble][mcbed-humble].
 
-This project is an adaptation of [tenfoldpaper/multipanda_ros2](https://github.com/tenfoldpaper/multipanda_ros2).
+This project was originally forked from [tenfoldpaper/multipanda_ros2](https://github.com/tenfoldpaper/multipanda_ros2) and is now maintained independently.
+We thank the original authors for their contributions and inspiration.
+
 
 ## License
 
