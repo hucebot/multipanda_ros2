@@ -132,22 +132,23 @@ RUN echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/user/Libraries/libfranka
 RUN echo 'export CMAKE_PREFIX_PATH=/home/user/Libraries/libfranka/lib/cmake:/home/user/Libraries/mujoco/lib/cmake' >> /home/user/.bashrc
 
 # Clone mujoco_ros_pkgs
-RUN cd /home/user/humble_ws/src && git clone https://github.com/tenfoldpaper/mujoco_ros_pkgs.git
+RUN cd /home/user/humble_ws/src && git clone https://github.com/hucebot/mujoco_ros_pkgs.git
 # Checkout the specific branch for ROS 2 Humble
 RUN cd /home/user/humble_ws/src/mujoco_ros_pkgs && git checkout wip_ros_control_humble
 
 # Clone custom_msgs
 RUN cd /home/user/humble_ws/src && git clone https://github.com/hucebot/franka_custom_msgs.git
 
-RUN chown -R user:user /home/user/
 # Do rosdep install and then build the packages
+RUN cd /home/user/humble_ws && apt-get update  \
+    && . /opt/ros/humble/setup.sh && rosdep update \
+    && rosdep install -i --from-path src --rosdistro humble -y
+
+RUN chown -R user:user /home/user/
 USER user
 WORKDIR /home/user/
 SHELL ["/bin/bash", "-c"]
-RUN source /home/user/.bashrc \
-    && . /opt/ros/humble/setup.sh \
-    && cd /home/user/humble_ws && rosdep update \
-    && cd /home/user/humble_ws && rosdep install -i --from-path src --rosdistro humble -y
+
 # Suppresss the XDG errors when running GUI apps like RVIZ
 RUN mkdir /tmp/${UID}
 RUN chown -R user:user /tmp/${UID}

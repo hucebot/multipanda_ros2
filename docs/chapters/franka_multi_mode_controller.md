@@ -309,4 +309,3 @@ An example python script that makes use of the MMC can be found in `mmc_demo_scr
 - [franka_description](./franka_description.md)
 - [franka_hardware](./franka_hardware.md)
 - [franka_multi_mode_controller](./franka_multi_mode_controller.md)
-- [garmi_packages](./garmi.md)

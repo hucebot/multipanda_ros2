@@ -1,10 +1,10 @@
 services:
-  realtime_humble:
-    image: bimanual:garmi
+  realtime_franka_humble:
+    image: hucebot:franka-humble
     build:
       context: ./
       dockerfile: Dockerfile
-    container_name: realtime_humble
+    container_name: realtime_franka_humble
     tty: true
     environment:
       - DISPLAY=:0
@@ -26,4 +26,3 @@ services:
       - ./franka_example_controllers:/home/user/humble_ws/src/bimanual_architecture/franka_example_controllers
       - ./franka_simple_publishers:/home/user/humble_ws/src/bimanual_architecture/franka_simple_publishers
       - ./franka_description:/home/user/humble_ws/src/bimanual_architecture/franka_description
-      - ./franka_gripper_custom:/home/user/humble_ws/src/bimanual_architecture/franka_gripper_custom

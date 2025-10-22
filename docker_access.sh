@@ -1,2 +1,2 @@
 #!/bin/bash
-docker exec -it realtime_humble bash
+docker exec -it realtime_franka_humble bash

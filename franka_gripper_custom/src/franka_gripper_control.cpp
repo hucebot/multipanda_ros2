@@ -6,12 +6,12 @@ GripperSubscriber::GripperSubscriber() : Node("panda_gripper") {
   this->declare_parameter("joint_names",
                           std::vector<std::string>{"panda_finger_joint1", "panda_finger_joint2"});
   this->declare_parameter("default_gripper_width", 0.01);
-  this->declare_parameter("maximum_gripper_width", 0.076);
-  this->declare_parameter("default_gripper_speed", 1.0);
+  this->declare_parameter("maximum_gripper_width", 0.074);
+  this->declare_parameter("default_gripper_speed", 0.1);
   this->declare_parameter("gripper_max_effort", 100.0);   // [N]
   this->declare_parameter("default_epsilon_inner", 0.1);  // [m]
   this->declare_parameter("default_epsilon_outer", 0.1);  // [m]
-  this->declare_parameter("pub_frequency", 50);           // actually limited to 15 Hz
+  this->declare_parameter("pub_frequency", 15);           // actually limited to 15 Hz
 
   // Get parameters
   robot_ip_ = this->get_parameter("robot_ip").as_string();
@@ -48,7 +48,6 @@ GripperSubscriber::GripperSubscriber() : Node("panda_gripper") {
                                    std::bind(&GripperSubscriber::publishGripperState, this));
 
   // init gripper memory state
-  gripper_->homing();
   gripper_->move(maximum_width_, default_speed_);  // maximum opening
   command_data_bool_prev = false;
 }

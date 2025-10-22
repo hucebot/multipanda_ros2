@@ -152,8 +152,8 @@ def generate_launch_description():
         ),
         Node(
             package='franka_simple_publishers',
-            executable='interactive_marker_pose_publisher',
-            name='interactive_marker_pose_publisher',
+            executable='interactive_marker_pose_publisher_gripper_action',
+            name='interactive_marker_pose_publisher_gripper_action',
             arguments=[
                 '--topic_name', 'cartesian_impedance/equilibrium_pose',
                 '--base_link', 'panda_link0',

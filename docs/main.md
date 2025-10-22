@@ -28,9 +28,6 @@ The `franka_hardware` package is the core of `multipanda_ros2`. This is where th
 ### [multimode_controller][mmc]
 The `multimode_controller` is a standard `ros2_control` controller, but uses its own controller implementation format, called _controllets_. It is designed to reduce the amount of programming overhead, and to allow extremely fast switching between different controllers within the same control mode.
 
-### [garmi_packages][garmi]
-The packages inside the `garmi_packages` folder constitute an example of how you can create a mobile manipulator platform using this package. It shows you how the packages can be structured, so as to maintain a good code structure.
-
 ## Other packages
 
 ### franka_control2
@@ -75,7 +72,6 @@ A `SemanticComponentInterface` wrapper for processing the robot model and state 
 [description]: ./chapters/franka_description.md
 [hardware]: ./chapters/franka_hardware.md
 [mmc]: ./chapters/franka_multi_mode_controller.md
-[garmi]: ./chapters/garmi.md
 
 [libfranka-instructions]: https://frankaemika.github.io/docs/installation_linux.html
 [mujoco-instructions]: https://mujoco.readthedocs.io/en/latest/programming/#building-mujoco-from-source
