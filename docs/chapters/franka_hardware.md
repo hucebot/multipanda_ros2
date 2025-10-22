@@ -92,4 +92,3 @@ The rest of the functions remain largely the same.
 - [franka_description](./franka_description.md)
 - [franka_hardware](./franka_hardware.md)
 - [franka_multi_mode_controller](./franka_multi_mode_controller.md)
-- [garmi_packages](./garmi.md)

@@ -1,10 +1,10 @@
 services:
-  realtime_humble:
-    image: bimanual:garmi
+  realtime_franka_humble:
+    image: hucebot:franka-humble
     build:
       context: ./
       dockerfile: Dockerfile
-    container_name: realtime_humble
+    container_name: realtime_franka_humble
     tty: true
     environment:
       - DISPLAY=:0

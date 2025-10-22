@@ -2,7 +2,6 @@
 ## A sim and real Panda robot integration based on the `ros2_control` framework
 <img src="docs/images/single_sim.png" alt="" height="250">
 <img src="docs/images/dual_sim.png" alt=""   height="250">
-<img src="docs/images/garmi_sim.png" alt=""  height="250">
 
 This project implements most features from the original `franka_ros` repository in ROS2 Humble, specifically for the Franka Emika Robot (Panda).
 This project significantly expands upon the original `franka_ros2` from the company, who dropped the support for the Pandas.
@@ -10,7 +9,7 @@ This project significantly expands upon the original `franka_ros2` from the comp
 Additionally, multi-arm mujoco simulation has been integrated, meaning you can now run the same controller on both simulated and real robots. 
 The simulation is designed as a plugin to the [`mujoco_ros_pkg`](https://github.com/ubi-agni/mujoco_ros_pkgs/). 
 
-**The current version relies on a [fork of the repository](https://github.com/tenfoldpaper/mujoco_ros_pkgs)**, which implements the `ros2_control` plugin as well as a generic `SystemInterface` for simple robot setups (e.g. a Panda arm mounted on a mobile base). This means, you should install the fork, not the original repo, until the two have been merged.
+**The current version relies on a [fork of the repository](https://github.com/tenfoldpaper/mujoco_ros_pkgs)**, which implements the `ros2_control` plugin as well as a generic `SystemInterface` for simple robot setups (e.g. a Panda arm mounted on a mobile base). This means, you should install the fork, not the original repo.
 
 Work is ongoing to integrate FR3 into the architecture.
 
@@ -38,7 +37,7 @@ More thorough information is available in the documentation.
         * Gravity for now just returns the corresponding `qfrc_gravcomp` force from mujoco.
         * Coriolis = `qfrc_bias - qfrc_gravcomp`
     * Camera is available as part of `mujoco_ros_pkg`'s features. You can simply add a `<camera>` object in your mujoco XML file, and the package will handle them.
-    * With the forked repository's `mujoco_ros2_control_system` package, you can easily add components with additional degrees of freedom to your robot. Take a look at `garmi_packages/garmi_description/robots/*.ros2_control.xacro` for an example on how to do this.
+    * With the forked repository's `mujoco_ros2_control_system` package, you can easily add components with additional degrees of freedom to your robot.
 
 ## Known issues
 * Joint position controller might cause some bad motor behaviors. Suggest using torque or velocity for now.
@@ -109,107 +108,58 @@ On a computer running Ubuntu 22.04 and real-time kernel (if you wish to use it w
         2. for simulated robot, source the workspace, and run:
             - Default: `ros2 launch franka_bringup dual_franka_sim.launch.py`.
             - `arm_id_1=mj_left` and `arm_id_2=mj_right` by default.
-    - Garmi (mobile manipulator with two Panda arms):
-        1. for simulated robot, source the workspace, and run:
-            - `ros2 launch garmi_bringup sim_garmi.launch.py`
 
 ## Using with Docker
 1. Build the docker image:
-    1. at the root of the repository (where `Dockerfile` is located), run 
-        `sudo docker build -t "bimanual:garmi" ./`, or whatever name you want; just adjust them in the `docker-compose.yml` or the `docker run` command below.
-    2. This installs all the required packages including `rosdep`.
-2. Start the docker container with `docker compose` (for iGPUs):
-    *   `xhost +; sudo docker compose -f docker-compose.yml up`
+        * at the root of the repository (where `Dockerfile` is located), run `bash docker_build.sh`.
+2. Start the docker container with `docker compose` via `bash docker_start.sh`:
         * `xhost +` is needed to give the Docker container access to the host's screen.
         * The `docker-compose.yml` file defines configurations that allow the container to run on the realtime kernel of the host, assuming that the host has one. The instructions were found in [here](https://github.com/2b-t/docker-realtime?tab=readme-ov-file).
-        * Currently, running GUI apps outputs warnings in the console. Those can be ignored.
-    *   Alternatively, with `docker run` (this has no RT kernel, so only the sim would work)
-        ``` bash
-        xhost +
-        sudo docker run \
-        -dit \
-        -v /tmp/.X11-unix:/tmp/.X11-unix \
-        --device=/dev/dri:/dev/dri \
-        --env="DISPLAY=$DISPLAY" \
-        --name=my_container \
-        --network="host" \
-        bimanual:garmi
-        ```
-        * The `--network="host"` is what enables the FCI IP address to be found from inside Docker without any additional configuration. TODO: Add a more elegant way to handle this.
-    * For other GPUs, please refer online.
-3. Access the container with:
-    - for `compose`, `sudo docker exec -it realtime_humble bash`
-    - for `run`, `sudo docker exec -it my_container bash`
+3. Access the container with `bash docker_access.sh`.
 4. (OPTIONAL) Check that the connection to the robot, RT kernel and screen are all working fine. 
     - You can check if docker is properly linked to your screen by running:
         - `ros2 run rviz2 rviz2` or
         - `~/Libraries/mujoco/bin/simulate`
     - For RT kernel and robot connection, run
         - `~/Libraries/libfranka/bin/communication_test <robot-ip>`
-5. Run single arm interactive cartesian impedance controller:
-    - `ros2 launch franka_bringup franka_cartesian_impedance.launch.py robot_ip:=<fci-ip>`.
+
+
+##  How to start and shut-down the real Franka
+
+Srart procedure:
+- Turns on the power switch behind the controller.
+- Go the web GUI accessible at the robot IP address (prefer Chromium) and unlock the joints (button)
+- GUI -> **Activate FCI**
+- Esnure that the security button is released: the Panda's lights are blue and the state in the GUI is **Ready**
+- Then you can start the controller (see below)
+- If problems with gripper: Settings -> End-effetor -> Homing
+
+Shutting down procedure
+- **ALWAYS** lock the joints via the GUI button
+- Press the *Shutdown* button in the GUI
+- Once the shutdown procedure ends, turns off the power switch behind the controller.
+  
+
+### Run the `custom_cartesian_impedance_controller`
+
+The `custom_cartesian_impedance_controller` (inside the pkg `franka_example_controllers`) allows to control the EE equilibrium pose by publishing over the topic `/cartesian_impedance/equilibrium_pose` (`geometry_msgs.msg.PoseStamped`). For example, this is what is done by the interactive marker in Rviz.
+
+To use it:
+    - `ros2 launch franka_bringup franka_cartesian_impedance.launch.py robot_ip:=176.16.0.1 use_interactive_marker:=true use_rviz:=true raise_collision_thresholds:=true`.
     - Through the interactive marker in *Rviz2* is it possible to control the equilibrium pose of the cartesian impedance controller.
     - Right-clicking the marker opens a menu through which is it possible to:
         - *Reset Marker*
-        - *Close Gripper*
-        - *Open Gripper*
+        - *Grasp*
+        - *Open*
 
-*NOTE*: Utility `docker compose` scripts are available to build the image (`docker_build.sh`), start (`docker_start.sh`), and access (`docker_access.sh`) the container.
+With `raise_collision_thresholds:=true` the safety threholds for the emergency collision stop. This eanbles a more extreme compliant behaviour, use with caution.
 
-## Using with Docker (HUCEBOT)
-
-To build the Docker image use the `docker_build.sh` script.
-
-To start the docker, open one terminal and run:
-
-```bash
-cd ~/multipanda_ros2/
-bash docker_start.sh
-```
-
-To access the Docker container, in another terminal run:
-```bash
-cd ~/multipanda_ros2/
-bash docker_access.sh
-```
-
-The `docker-compose.yaml` is set-up to mount inside the Docker some of the packages. This allows you to directly test your changes without re-building the Docker image.
-
-### Starting up the Franka
-- go the web GUI (prefer chromium) and unlock the joints (button)
-- gui>activate_FCI > press the dead-man button (midway)
-- then you can start the controller (see below)
-- if problems with gripper: settings>end-effetor>homing
-- shutdown: shutdown in the app first (then use the emergency stop)
-  
-### Run the `custom_cartesian_impedance_controller`
-
-The `custom_cartesian_impedance_controller` allows to control the EE equilibrium pose by publishing over the topic `/cartesian_impedance/equilibrium_pose` (`geometry_msgs.msg.PoseStamped`). For example, this is what is done by the interactive marker in Rviz.
-
-#### Real Franka
-
-To launch the controller
-```bash
-ros2 launch franka_bringup franka_cartesian_impedance.launch.py robot_ip:=176.16.0.1 use_interactive_marker:=true use_rviz:=true raise_collision_thresholds:=false
-```
-
-To launch the controller *WITH THE GRIPPER topic*
-```bash
-ros2 launch franka_bringup franka_cartesian_impedance_gripper.launch.py robot_ip:=176.16.0.1 use_interactive_marker:=true use_rviz:=true raise_collision_thresholds:=false
-```
-
-
-Other possibly useful arguments are:
-- `use_rviz` (default: True)
-- `use_interactive_marker` (default: True)
-- `raise_collision_thresholds` (default: True)
-
-#### Simulation
-
-You can run the same cartesian impedance controller in simulation via:
+You can test the same cartesian impedance controller in simulation via:
 ```bash
 ros2 launch franka_bringup franka_sim_cartesian_impedance.launch.py 
 ```
+
+**NOTE**: the other controllers of `franka_example_controllers` **HAVE NOT BEEN TESTED**, use with caution.
 
 #### Other utilities
 
@@ -230,6 +180,8 @@ colcon build --packages-select <desired-package-name>
             
 ## Credits
 The original version is forked from mcbed's port of franka_ros2 for [humble][mcbed-humble].
+
+This project is an adaptation of [tenfoldpaper/multipanda_ros2](https://github.com/tenfoldpaper/multipanda_ros2).
 
 ## License
 
