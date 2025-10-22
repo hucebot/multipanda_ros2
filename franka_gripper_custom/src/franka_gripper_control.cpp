@@ -11,7 +11,7 @@ GripperSubscriber::GripperSubscriber() : Node("panda_gripper") {
   this->declare_parameter("gripper_max_effort", 100.0);   // [N]
   this->declare_parameter("default_epsilon_inner", 0.1);  // [m]
   this->declare_parameter("default_epsilon_outer", 0.1);  // [m]
-  this->declare_parameter("pub_frequency", 50);           // actually limited to 15 Hz
+  this->declare_parameter("pub_frequency", 15);           // actually limited to 15 Hz
 
   // Get parameters
   robot_ip_ = this->get_parameter("robot_ip").as_string();
