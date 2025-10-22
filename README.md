@@ -109,7 +109,7 @@ On a computer running Ubuntu 22.04 and real-time kernel (if you wish to use it w
             - Default: `ros2 launch franka_bringup dual_franka_sim.launch.py`.
             - `arm_id_1=mj_left` and `arm_id_2=mj_right` by default.
 
-## Using with Docker
+## Usage with Docker
 1. Build the docker image:
         * at the root of the repository (where `Dockerfile` is located), run `bash docker_build.sh`.
 2. Start the docker container with `docker compose` via `bash docker_start.sh`:
@@ -122,6 +122,9 @@ On a computer running Ubuntu 22.04 and real-time kernel (if you wish to use it w
         - `~/Libraries/mujoco/bin/simulate`
     - For RT kernel and robot connection, run
         - `~/Libraries/libfranka/bin/communication_test <robot-ip>`
+
+### Simulation Docker
+The default `docker-compose` options are set to run on the realtime kernel. This might create some issues when trying to run the simulation environment. So, if you only want to use the simulated Franka, you can use the utility script `run_sim_docker.sh`, that uses `docker run` without RT kernel options. The first time you run the script it starts the docker and opens up a terminal. If the container is still up, it simply opens a new terminal inside.
 
 
 ##  How to start and shut-down the real Franka
