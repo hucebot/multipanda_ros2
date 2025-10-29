@@ -185,17 +185,13 @@ CallbackReturn CustomCartesianImpedanceController::on_init() {
         std::bind(&CustomCartesianImpedanceController::equilibriumPoseCallback, this,
                   std::placeholders::_1));
     cartesian_pos_des_filt_pub_ = get_node()->create_publisher<geometry_msgs::msg::PoseStamped>(
-        "/cartesian_impedance/cartesian_pos_des_filt", 10);
+        "/cartesian_impedance/cartesian_pos_des_filt", 1);
     cartesian_pos_curr_pub_ = get_node()->create_publisher<geometry_msgs::msg::PoseStamped>(
-        "/cartesian_impedance/cartesian_pos_curr", 10);
-    joint_pos_pub_ = get_node()->create_publisher<sensor_msgs::msg::JointState>(
-        "/cartesian_impedance/joint_pos", 10);
-    joint_vel_pub_ = get_node()->create_publisher<sensor_msgs::msg::JointState>(
-        "/cartesian_impedance/joint_vel", 10);
-    joint_torques_pub_ = get_node()->create_publisher<sensor_msgs::msg::JointState>(
-        "/cartesian_impedance/joint_torques", 10);
-    f_ext_cart_pub_ = get_node()->create_publisher<sensor_msgs::msg::JointState>(
-        "/cartesian_impedance/f_ext_cart", 10);
+        "/cartesian_impedance/cartesian_pos_curr", 1);
+    joint_state_pub_ = get_node()->create_publisher<sensor_msgs::msg::JointState>(
+        "/cartesian_impedance/joint_state", 1);
+    f_ext_cart_pub_ = get_node()->create_publisher<geometry_msgs::msg::WrenchStamped>(
+        "/cartesian_impedance/f_ext_cart", 1);
 
   } catch (const std::exception& e) {
     fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
@@ -306,17 +302,14 @@ void CustomCartesianImpedanceController::publishData() {
   // publish data
   geometry_msgs::msg::PoseStamped msgCartPosDesFilt;
   geometry_msgs::msg::PoseStamped msgCartPosCurr;
-  sensor_msgs::msg::JointState msgJointPos;
-  sensor_msgs::msg::JointState msgJointVel;
-  sensor_msgs::msg::JointState msgJointTorques;
-  sensor_msgs::msg::JointState msgForceExtCart;
+  sensor_msgs::msg::JointState msgJointState;
+  geometry_msgs::msg::WrenchStamped msgForceExtCart;
 
-  msgCartPosDesFilt.header.stamp = get_node()->now();
-  msgCartPosCurr.header.stamp = get_node()->now();
-  msgJointPos.header.stamp = get_node()->now();
-  msgJointVel.header.stamp = get_node()->now();
-  msgJointTorques.header.stamp = get_node()->now();
-  msgForceExtCart.header.stamp = get_node()->now();
+  auto stamp = get_node()->now();
+  msgCartPosDesFilt.header.stamp = stamp;
+  msgCartPosCurr.header.stamp = stamp;
+  msgJointState.header.stamp = stamp;
+  msgForceExtCart.header.stamp = stamp;
 
   // Cartesian target pose filtered
   msgCartPosDesFilt.pose.position.x = position_d_(0);
@@ -336,37 +329,31 @@ void CustomCartesianImpedanceController::publishData() {
   msgCartPosCurr.pose.orientation.z = current_orientation_.z();
   msgCartPosCurr.pose.orientation.w = current_orientation_.w();
 
-  // positions
-  msgJointPos.position.resize(num_joints_);
+  // Joint state
+  msgJointState.name = {
+    arm_id_+"_joint1", arm_id_+"_joint2", arm_id_+"_joint3", 
+    arm_id_+"_joint4", arm_id_+"_joint5", arm_id_+"_joint6", arm_id_+"_joint7"
+  };
+  msgJointState.position.resize(num_joints_);
+  msgJointState.velocity.resize(num_joints_);
+  msgJointState.effort.resize(num_joints_);
   for (int i = 0; i < num_joints_; ++i) {
-    msgJointPos.position[i] = q_[i];
-  }
-
-  // velocities
-  msgJointVel.velocity.resize(num_joints_);
-  for (int i = 0; i < num_joints_; ++i) {
-    msgJointVel.velocity[i] = dq_[i];
-  }
-
-  // torques
-  msgJointTorques.name = {"T1", "T2", "T3", "T4", "T5", "T6", "T7"};
-  msgJointTorques.effort.resize(num_joints_);
-  for (int i = 0; i < num_joints_; ++i) {
-    msgJointTorques.effort[i] = tau_J_d_[i];
+    msgJointState.position[i] = q_[i];
+    msgJointState.velocity[i] = dq_[i];
+    msgJointState.effort[i] = tau_J_d_[i];
   }
 
   // end-effector external force
-  msgForceExtCart.name = {"Fx", "Fy", "Fz", "Tx", "Ty", "Tz"};
-  msgForceExtCart.effort.resize(6);
-  for (int i = 0; i < num_joints_; ++i) {
-    msgForceExtCart.effort[i] = f_ext_cart_[i];
-  }
+  msgForceExtCart.wrench.force.x = f_ext_cart_[0];
+  msgForceExtCart.wrench.force.y = f_ext_cart_[1];
+  msgForceExtCart.wrench.force.z = f_ext_cart_[2];
+  msgForceExtCart.wrench.torque.x = f_ext_cart_[3];
+  msgForceExtCart.wrench.torque.y = f_ext_cart_[4];
+  msgForceExtCart.wrench.torque.z = f_ext_cart_[5];
 
   cartesian_pos_des_filt_pub_->publish(msgCartPosDesFilt);
   cartesian_pos_curr_pub_->publish(msgCartPosCurr);
-  joint_pos_pub_->publish(msgJointPos);
-  joint_vel_pub_->publish(msgJointVel);
-  joint_torques_pub_->publish(msgJointTorques);
+  joint_state_pub_->publish(msgJointState);
   f_ext_cart_pub_->publish(msgForceExtCart);
 }
 
