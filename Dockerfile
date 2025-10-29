@@ -66,6 +66,7 @@ RUN apt-get update -y && apt-get install -y --allow-unauthenticated \
     ros-humble-tf-transformations \
     ros-humble-rmw-cyclonedds-cpp \
     ros-humble-plotjuggler-ros \
+    ros-humble-rqt-reconfigure \
     && rm -rf /var/lib/apt/lists/*
 
 

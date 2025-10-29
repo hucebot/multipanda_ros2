@@ -12,6 +12,10 @@ if [ $isRunning -eq 0 ]; then
         --env="ROS_DOMAIN_ID=39" \
         --name=sim_franka_humble \
         --network="host" \
+        -v ./franka_bringup:/home/user/humble_ws/src/bimanual_architecture/franka_bringup \
+        -v ./franka_example_controllers:/home/user/humble_ws/src/bimanual_architecture/franka_example_controllers \
+        -v ./franka_simple_publishers:/home/user/humble_ws/src/bimanual_architecture/franka_simple_publishers \
+        -v ./franka_description:/home/user/humble_ws/src/bimanual_architecture/franka_description \
         --entrypoint /bin/bash \
         hucebot:franka-humble
 
