@@ -64,15 +64,37 @@ def generate_launch_description():
             ' hand:=', str(load_gripper).lower(),
             ' initial_positions:=', initial_positions])
     
-    params = {'robot_description': robot_description}
-
     node_robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
         output='screen',
         namespace= ns,
-        parameters=[params]
+        parameters=[{'robot_description': robot_description}]
     )
+
+    robot_description_no_hand = Command(
+        [FindExecutable(name='xacro'), ' ', franka_xacro_file, 
+            ' arm_id:=', arm_id, 
+            ' hand:=false',
+            ' initial_positions:=', initial_positions])
+
+    node_urdf_publisher_no_hand = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        output='screen',
+        name='urdf_publisher_no_hand',
+        namespace=ns,
+        parameters=[{
+            'robot_description': robot_description_no_hand,
+            'publish_frequency': 0.0  # Don't publish TF
+        }],
+        remappings=[
+            ('robot_description', 'robot_description_no_hand')  # Remap the topic
+        ]
+    )
+
+
+
 
     # Joint state publisher setup
     jsp_source_list = [concatenate_ns(ns, '/joint_state_broadcaster/joint_states', True)]
@@ -126,6 +148,7 @@ def generate_launch_description():
 
         # Miscellaneous
         node_robot_state_publisher,
+        node_urdf_publisher_no_hand,
         node_joint_state_publisher,
 
 
