@@ -75,7 +75,7 @@ def generate_launch_description():
     )
 
     # Joint state publisher setup
-    jsp_source_list = [concatenate_ns(ns, 'joint_states', True)]
+    jsp_source_list = [concatenate_ns(ns, '/joint_state_broadcaster/joint_states', True)]
     if(load_gripper):
         jsp_source_list.append(concatenate_ns(ns, 'panda_gripper_sim_node/joint_states', True))
 
@@ -98,7 +98,7 @@ def generate_launch_description():
         # Launch args
         DeclareLaunchArgument(
             use_rviz_param,
-            default_value='false',
+            default_value='true',
             description='Visualize the robot in Rviz'),
         DeclareLaunchArgument(
             arm_id_param,

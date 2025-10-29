@@ -40,7 +40,7 @@ def generate_launch_description():
     use_rviz = LaunchConfiguration(use_rviz_param)
 
     # Fixed variables
-    load_gripper = False # We make gripper a fixed variable, mainly because parsing the argument 
+    load_gripper = True # We make gripper a fixed variable, mainly because parsing the argument 
                         # within generate_launch_description is a fairly unintuitive process, 
                         # and it's not worth doing just for a single boolean.
     
@@ -75,7 +75,7 @@ def generate_launch_description():
     )
 
     # Joint state publisher setup
-    jsp_source_list = [concatenate_ns(ns, 'joint_states', True)]
+    jsp_source_list = [concatenate_ns(ns, '/joint_state_broadcaster/joint_states', True)]
     if(load_gripper):
         jsp_source_list.append(concatenate_ns(ns, 'panda_gripper_sim_node/joint_states', True))
 
@@ -126,16 +126,17 @@ def generate_launch_description():
 
         # Miscellaneous
         node_robot_state_publisher,
+        node_joint_state_publisher,
 
 
-        Node(
-            package= 'rqt_controller_manager',
-            executable = 'rqt_controller_manager',
-        ),
-        Node(
-            package='plotjuggler',
-            executable='plotjuggler',
-        ),
+        # Node(
+        #     package= 'rqt_controller_manager',
+        #     executable = 'rqt_controller_manager',
+        # ),
+        # Node(
+        #     package='plotjuggler',
+        #     executable='plotjuggler',
+        # ),
         Node( # RVIZ dependency
             package='controller_manager',
             executable='spawner',

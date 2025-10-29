@@ -67,7 +67,6 @@ CallbackReturn CustomJointImpedanceController::on_init() {
     auto_declare<std::vector<double>>("d_gains", std::vector<double>(7, 0.0));
     auto_declare<std::vector<double>>("torque_limits", std::vector<double>(7, 87.0));
 
-    // Create subscription to MPC commands
     sub_desired_joint_ = get_node()->create_subscription<sensor_msgs::msg::JointState>(
         get_node()->get_parameter("topic").as_string(), 10,
         std::bind(&CustomJointImpedanceController::desiredJointCallback, this,
