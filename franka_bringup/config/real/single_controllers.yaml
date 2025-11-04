@@ -20,6 +20,10 @@ controller_manager:
     custom_cartesian_impedance_controller:
       type: franka_example_controllers/CustomCartesianImpedanceController
 
+    custom_joint_impedance_controller:
+        type: franka_example_controllers/CustomJointImpedanceController
+
+
 franka_robot_state_broadcaster:
   ros__parameters:
     arm_id: panda
@@ -55,3 +59,25 @@ joint_impedance_example_controller:
 custom_cartesian_impedance_controller:
   ros__parameters:
     arm_id: panda
+
+
+custom_joint_impedance_controller:
+  ros__parameters:
+    arm_id: panda
+    pub_frequency: 100.0
+    k_gains:
+      - 600.0
+      - 600.0
+      - 600.0
+      - 600.0
+      - 250.0
+      - 150.0
+      - 50.0
+    d_gains:
+      - 50.0
+      - 50.0
+      - 50.0
+      - 50.0
+      - 30.0
+      - 25.0
+      - 15.0

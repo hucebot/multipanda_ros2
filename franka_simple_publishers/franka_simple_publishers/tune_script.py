@@ -26,8 +26,8 @@ class JointImpedanceTuner(Node):
         'max': np.array([2.8973, 1.7628, 2.8973, -0.0698, 2.8973, 3.7525, 2.8973])
     }
     
-    def __init__(self, joint_to_tune=0, frequency=0.5, publish_rate=100.0, 
-                 rest_positions=None, amplitude_scale=0.8):
+    def __init__(self, joint_to_tune=0, frequency=0.01, publish_rate=100.0, 
+                 rest_positions=None, amplitude_scale=0.1):
         super().__init__('joint_impedance_tuner')
         
         # Set parameters from arguments
@@ -151,12 +151,12 @@ Examples:
     
     parser.add_argument('--joint', '-j', type=int, default=0,
                        help='Joint index to tune (0-6), default=0')
-    parser.add_argument('--freq', '-f', type=float, default=0.5,
-                       help='Sinusoid frequency in Hz, default=0.5')
+    parser.add_argument('--freq', '-f', type=float, default=.01,
+                       help='Sinusoid frequency in Hz, default=0.1')
     parser.add_argument('--rate', '-r', type=float, default=100.0,
                        help='Publishing rate in Hz, default=100.0')
-    parser.add_argument('--amp', '-a', type=float, default=0.8,
-                       help='Amplitude scale (0-1), default=0.8')
+    parser.add_argument('--amp', '-a', type=float, default=0.2,
+                       help='Amplitude scale (0-1), default=0.2')
     parser.add_argument('--rest', nargs=7, type=float, default=None,
                        help='Rest positions for 7 joints (rad), default=[0, -0.785, 0, -2.356, 0, 1.571, 0.785]')
     
