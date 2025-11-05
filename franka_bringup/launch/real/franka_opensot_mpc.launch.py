@@ -50,7 +50,7 @@ def generate_launch_description():
          ' fake_sensor_commands:=', fake_sensor_commands])
 
     rviz_file = os.path.join(get_package_share_directory('franka_description'), 'rviz',
-                             'visualize_franka.rviz')
+                             'visualize_franka_joint_impedance.rviz')
 
     franka_controllers = PathJoinSubstitution(
         [
@@ -62,7 +62,7 @@ def generate_launch_description():
     )
 
     robot_description_no_hand = Command(
-        [FindExecutable(name='xacro'), ' ', franka_xacro_file, ' hand:=', load_gripper,
+        [FindExecutable(name='xacro'), ' ', franka_xacro_file, ' hand:=', 'false',
          ' robot_ip:=', robot_ip, ' use_fake_hardware:=', use_fake_hardware,
          ' fake_sensor_commands:=', fake_sensor_commands])
 
@@ -73,11 +73,13 @@ def generate_launch_description():
         name='urdf_publisher_no_hand',
         parameters=[{
             'robot_description': robot_description_no_hand,
-            'publish_frequency': 0.0  # Don't publish TF
+            'tf_prefix': "mpc",
+            # 'publish_frequency': 0.0  # Don't publish TF
         }],
         remappings=[
-            ('robot_description', 'robot_description_no_hand')  # Remap the topic
-        ]
+            ('robot_description', 'robot_description_no_hand'),  # Remap the topic
+            ('joint_states', 'joint_impedance/joints_desired'),
+        ],
     )
 
     return LaunchDescription([
