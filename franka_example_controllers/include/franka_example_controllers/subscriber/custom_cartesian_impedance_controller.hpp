@@ -65,7 +65,7 @@ class CustomCartesianImpedanceController : public controller_interface::Controll
   Vector6d f_ext_cart_;
   Vector6d f_ext_cart_prev;
 
-  double filter_params_{0.008};
+  double filter_params_{0.008}; // 0.008
   const double delta_tau_max_{0.5};
   Matrix6d stiffness_;
   Matrix6d damping_;
