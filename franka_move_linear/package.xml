@@ -7,8 +7,8 @@
   <maintainer email="leonardo.bertelli96@gmail.com">leonardo</maintainer>
   <license>TODO: License declaration</license>
 
-  <build_depend>franka_custom_msgs</build_depend>
-  <exec_depend>franka_custom_msgs</exec_depend>
+  <build_depend>custom_msgs</build_depend>
+  <exec_depend>custom_msgs</exec_depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

@@ -110,12 +110,24 @@ CallbackReturn MoveToStartExampleController::on_configure(
     k_gains_(i) = k_gains.at(i);
   }
   dq_filtered_.setZero();
+
+  // CREATE PUBLISHER
+  gripper_action_pub_ = get_node()->create_publisher<custom_msgs::msg::GripperWidth>("/panda_gripper/gripper_command", 10);
+
   return CallbackReturn::SUCCESS;
 }
 
 CallbackReturn MoveToStartExampleController::on_activate(
     const rclcpp_lifecycle::State& /*previous_state*/) {
   updateJointStates();
+
+  // SEND GRIPPER COMMAND
+  custom_msgs::msg::GripperWidth msg;
+  msg.header.stamp = this->get_node()->now();
+  msg.width = 0.0;  // OPEN
+
+  gripper_action_pub_->publish(msg);
+
   motion_generator_ = std::make_unique<MotionGenerator>(0.2, q_, q_goal_);
   start_time_ = this->get_node()->now();
   return CallbackReturn::SUCCESS;

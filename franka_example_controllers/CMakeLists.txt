@@ -22,6 +22,7 @@ find_package(hardware_interface REQUIRED)
 find_package(franka_semantic_components REQUIRED)
 find_package(generate_parameter_library)
 find_package(franka_msgs REQUIRED)
+find_package(custom_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(multi_mode_control_msgs REQUIRED)
@@ -65,6 +66,7 @@ ament_target_dependencies(
         geometry_msgs
         sensor_msgs
         multi_mode_control_msgs
+        custom_msgs
 )
 
 generate_parameter_library(franka_example_controllers_parameters src/comless/model_example_controller_parameters.yaml)

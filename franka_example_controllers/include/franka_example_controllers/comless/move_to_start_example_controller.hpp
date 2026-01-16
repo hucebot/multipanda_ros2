@@ -21,6 +21,8 @@
 #include <controller_interface/controller_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
 
+#include "custom_msgs/msg/gripper_width.hpp"
+
 #include "motion_generator.hpp"
 
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
@@ -50,6 +52,7 @@ class MoveToStartExampleController : public controller_interface::ControllerInte
   Vector7d d_gains_;
   rclcpp::Time start_time_;
   std::unique_ptr<MotionGenerator> motion_generator_;
+  rclcpp::Publisher<custom_msgs::msg::GripperWidth>::SharedPtr gripper_action_pub_;
 
   void updateJointStates();
 };
