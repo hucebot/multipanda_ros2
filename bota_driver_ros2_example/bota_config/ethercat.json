@@ -1,0 +1,33 @@
+{
+    "driver_config": {
+        "product_name": "BFT-SENS-SER-M8",
+        "serial_number": "SN000853",
+        "communication_interface_name": "CANopen_over_EtherCAT",
+        "communication_interface_params": {
+            "network_interface": "enp0s31f6"
+        },
+        "sensor_operation_params": {
+            "app_mode": 1,
+            "app_submode": 9,
+            "wrench_offset": {
+                "fx": 0.0,
+                "fy": 0.0,
+                "fz": 0.0,
+                "tx": 0.0,
+                "ty": 0.0,
+                "tz": 0.0
+            },
+            "temperature_coefficients": {
+                "fx": 0.0,
+                "fy": 0.0,
+                "fz": 0.0,
+                "tx": 0.0,
+                "ty": 0.0,
+                "tz": 0.0
+            }
+        },
+        "driver_operation_params": {
+            "runtime_verbosity": true
+        }
+    }
+}

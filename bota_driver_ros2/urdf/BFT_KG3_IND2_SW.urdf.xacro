@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-1-g15f4949  Build Version: 1.6.7594.29634
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:macro name="BFT_KG3_IND2_SW" params="prefix">
+
+    <link
+      name="${prefix}_mounting">
+      <inertial>
+        <origin
+          xyz="-9.2572E-05 9.9964E-05 0.010931"
+          rpy="0 0 0" />
+        <mass
+          value="0.12276" />
+        <inertia
+          ixx="6.7604E-05"
+          ixy="-1.3153E-07"
+          ixz="-6.7322E-08"
+          iyy="7.1488E-05"
+          iyz="9.2073E-08"
+          izz="0.0001292" />
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://bota_driver/meshes/BFT_KG3_IND2_SW/mounting.dae" />
+        </geometry>
+        <material
+          name="">
+          <color
+            rgba="0.6902 0.61176 0.52941 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <cylinder radius="0.035" length="0.028"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link
+      name="${prefix}_imu">
+      <inertial>
+        <origin
+          xyz="-0.030023 -0.0045093 -0.0051888"
+          rpy="0 0 0" />
+        <mass
+          value="1.7362E-05" />
+        <inertia
+          ixx="2.2687E-11"
+          ixy="-4.0788E-15"
+          ixz="-9.8826E-21"
+          iyy="2.2689E-11"
+          iyz="-2.0704E-20"
+          izz="4.2871E-11" />
+      </inertial>
+    </link>
+
+    <joint
+      name="${prefix}_mounting_to_imu"
+      type="fixed">
+      <origin
+        xyz="0.0197035899999985 0.00748612999999993 0.0077875000000011"
+        rpy="0 0 0" />
+      <parent
+        link="${prefix}_mounting" />
+      <child
+        link="${prefix}_imu" />
+      <axis
+        xyz="0 0 0" />
+    </joint>
+
+    <link
+      name="${prefix}_wrench">
+      <inertial>
+        <origin
+          xyz="5.1361E-07 -0.00023207 -0.0079102"
+          rpy="0 0 0" />
+        <mass
+          value="0.12139" />
+        <inertia
+          ixx="5.1194E-05"
+          ixy="2.2369E-08"
+          ixz="1.7665E-07"
+          iyy="4.4555E-05"
+          iyz="1.1698E-07"
+          izz="9.2665E-05"/>
+      </inertial>
+    </link>
+
+    <joint
+      name="${prefix}_mounting_to_wrench"
+      type="fixed">
+      <origin
+        xyz="0 0 0.0379800000000009"
+        rpy="0 0 0" />
+      <parent
+        link="${prefix}_mounting" />
+      <child
+        link="${prefix}_wrench" />
+      <axis
+        xyz="0 0 0" />
+    </joint>
+  </xacro:macro>
+</robot>

@@ -1,0 +1,10 @@
+<library path="bota_ft_sensor">
+  <class  name="bota_driver/BotaFTSensor"
+          type="bota_driver::BotaFTSensor" 
+          base_class_type="hardware_interface::SensorInterface">
+    <description>
+      Hardware interface for Bota Systems force-torque sensor.
+    </description>
+  </class>
+</library>
+

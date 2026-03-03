@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>bota_driver</name>
+  <version>1.1.5</version>
+  <description>Driver for Bota Systems FT Sensors</description>
+  <maintainer email="support@botasys.com">Bota Systems AG</maintainer>
+  <license>BSL3</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <buildtool_depend>rosidl_default_generators</buildtool_depend>
+
+  <!-- Core dependencies -->
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_srvs</depend>
+
+  <!-- ROS 2 message generation -->
+  <!-- <depend>type_description_interfaces</depend> Not avaiable in ROS 2 Humble  -->
+  <exec_depend>rosidl_default_runtime</exec_depend>
+  <member_of_group>rosidl_interface_packages</member_of_group>
+
+  <!-- Lifecycle support - only required for building, optional for runtime --> 
+  <build_depend>rclcpp_lifecycle</build_depend>
+  <build_depend>lifecycle_msgs</build_depend>
+  
+  <!-- ros2_control hardware interface support - only required for building, optional for runtime -->
+  <build_depend>hardware_interface</build_depend>
+  <build_depend>pluginlib</build_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

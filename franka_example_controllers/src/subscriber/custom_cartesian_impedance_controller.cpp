@@ -83,21 +83,6 @@ controller_interface::return_type CustomCartesianImpedanceController::update(
   dq_ = dq;
   tau_J_d_ = tau_J_d;
 
-  // get gravity vector
-  Eigen::Map<const Vector7d> gravity(franka_robot_model_->getGravityForceVector().data());
-  // compute jacobian in n-frame
-  Eigen::Matrix<double, 6, 7> jacobian_n(
-      franka_robot_model_->getBodyJacobian(franka::Frame::kEndEffector).data());
-  // compute its pseudo-inverse
-  Eigen::MatrixXd jacobian_n_transpose_pinv;
-  pseudoInverse(jacobian_n.transpose(), jacobian_n_transpose_pinv);
-  // compute end-effector external force
-  // coriolis already includes qdot, while tau_J_d already includes gravity
-  Vector6d f_ext_cart_est = jacobian_n_transpose_pinv * (coriolis - tau_J_d);
-  // filter force
-  f_ext_cart_ = filter_params_ * f_ext_cart_est + (1.0 - filter_params_) * f_ext_cart_;
-  f_ext_cart_prev = f_ext_cart_;
-
   // position error
   error_.head(3) << current_position - position_d_;
   // clip translational error
@@ -190,8 +175,6 @@ CallbackReturn CustomCartesianImpedanceController::on_init() {
         "/cartesian_impedance/cartesian_pos_curr", 1);
     joint_state_pub_ = get_node()->create_publisher<sensor_msgs::msg::JointState>(
         "/cartesian_impedance/joint_state", 1);
-    f_ext_cart_pub_ = get_node()->create_publisher<geometry_msgs::msg::WrenchStamped>(
-        "/cartesian_impedance/f_ext_cart", 1);
 
   } catch (const std::exception& e) {
     fprintf(stderr, "Exception thrown during init stage with message: %s \n", e.what());
@@ -230,8 +213,6 @@ CallbackReturn CustomCartesianImpedanceController::on_activate(
   orientation_d_ = Quaterniond(init_pose_matrix_.block<3, 3>(0, 0));
   orientation_d_target_ = orientation_d_;
   q_d_nullspace_ = Vector7d(franka_robot_model_->getRobotState()->q.data());
-
-  f_ext_cart_prev.setZero();
 
   stiffness_.setIdentity();
   stiffness_.topLeftCorner(3, 3) << pos_stiff_ * Matrix3d::Identity();
@@ -303,13 +284,11 @@ void CustomCartesianImpedanceController::publishData() {
   geometry_msgs::msg::PoseStamped msgCartPosDesFilt;
   geometry_msgs::msg::PoseStamped msgCartPosCurr;
   sensor_msgs::msg::JointState msgJointState;
-  geometry_msgs::msg::WrenchStamped msgForceExtCart;
 
   auto stamp = get_node()->now();
   msgCartPosDesFilt.header.stamp = stamp;
   msgCartPosCurr.header.stamp = stamp;
   msgJointState.header.stamp = stamp;
-  msgForceExtCart.header.stamp = stamp;
 
   // Cartesian target pose filtered
   msgCartPosDesFilt.pose.position.x = position_d_(0);
@@ -342,19 +321,6 @@ void CustomCartesianImpedanceController::publishData() {
     msgJointState.velocity[i] = dq_[i];
     msgJointState.effort[i] = tau_J_d_[i];
   }
-
-  // end-effector external force
-  msgForceExtCart.wrench.force.x = f_ext_cart_[0];
-  msgForceExtCart.wrench.force.y = f_ext_cart_[1];
-  msgForceExtCart.wrench.force.z = f_ext_cart_[2];
-  msgForceExtCart.wrench.torque.x = f_ext_cart_[3];
-  msgForceExtCart.wrench.torque.y = f_ext_cart_[4];
-  msgForceExtCart.wrench.torque.z = f_ext_cart_[5];
-
-  cartesian_pos_des_filt_pub_->publish(msgCartPosDesFilt);
-  cartesian_pos_curr_pub_->publish(msgCartPosCurr);
-  joint_state_pub_->publish(msgJointState);
-  f_ext_cart_pub_->publish(msgForceExtCart);
 }
 
 }  // namespace franka_example_controllers

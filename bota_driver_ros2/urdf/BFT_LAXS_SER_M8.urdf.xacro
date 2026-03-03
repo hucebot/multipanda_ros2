@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-1-g15f4949  Build Version: 1.6.7594.29634
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:macro name="BFT_LAXS_SER_M8" params="prefix">
+
+    <link
+      name="${prefix}_mounting">
+      <inertial>
+        <origin
+          xyz="-1.1834E-05 -0.001718 0.016832"
+          rpy="0 0 0" />
+        <mass
+          value="0.31844" />
+        <inertia
+          ixx="0.00019906"
+          ixy="2.9369E-10"
+          ixz="7.8769E-10"
+          iyy="0.00020009"
+          iyz="2.9785E-07"
+          izz="0.00034267" />
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://bota_driver/meshes/BFT_LAXS_M8/mounting.STL" />
+        </geometry>
+        <material name="">
+          <color rgba="0.50196 0.50196 0.50196 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin
+          xyz="0 0 0.02225"
+          rpy="0 0 0" />
+        <geometry>
+          <cylinder radius="0.0415" length="0.0445"/>
+        </geometry>
+      </collision>
+      <collision>
+        <origin
+          xyz="0 -0.0465 0.015"
+          rpy="0 0 0" />
+        <geometry>
+          <box size="0.018 0.015 0.027" />
+        </geometry>
+      </collision>
+      <collision>
+        <origin
+          xyz="0 -0.0665 0.015"
+          rpy="1.57 0 0" />
+        <geometry>
+          <cylinder radius="0.0065" length="0.032"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link
+      name="${prefix}_wrench">
+      <inertial>
+        <origin
+          xyz="-9.92E-05 -5.1511E-06 -0.012601"
+          rpy="0 0 0" />
+        <mass
+          value="0.1522" />
+        <inertia
+          ixx="4.3975E-05"
+          ixy="7.7798E-11"
+          ixz="1.3264E-07"
+          iyy="4.3577E-05"
+          iyz="-1.1015E-08"
+          izz="6.8828E-05" />
+      </inertial>
+    </link>
+
+    <joint
+      name="${prefix}_mounting_to_wrench"
+      type="fixed">
+      <origin
+        xyz="0.0 0.0 0.0445"
+        rpy="0 0 0" />
+      <parent
+        link="${prefix}_mounting" />
+      <child
+        link="${prefix}_wrench" />
+      <axis
+        xyz="0 0 0" />
+    </joint>
+
+    <link
+      name="mech1">
+    </link>
+
+    <joint
+      name="${prefix}_mounting_to_mech1"
+      type="fixed">
+      <origin
+        xyz="0.0415 0 0.0145"
+        rpy="1.5707963267949 0 1.5707963267949" />
+      <parent
+        link="${prefix}_mounting" />
+      <child
+        link="mech1" />
+      <axis
+        xyz="0 0 0" />
+    </joint>
+
+    <link
+      name="mech2">
+    </link>
+
+    <joint
+      name="${prefix}_mounting_to_mech2"
+      type="fixed">
+      <origin
+        xyz="0 0.0415 0.0145"
+        rpy="1.5707963267949 0 3.14159265358979" />
+      <parent
+        link="${prefix}_mounting" />
+      <child
+        link="mech2" />
+      <axis
+        xyz="0 0 0" />
+    </joint>
+
+    <link
+      name="mech3">
+    </link>
+
+    <joint
+      name="${prefix}_mounting_to_mech3"
+      type="fixed">
+      <origin
+        xyz="-0.0415 0 0.0145"
+        rpy="1.5707963267949 0 -1.5707963267949" />
+      <parent
+        link="${prefix}_mounting" />
+      <child
+        link="mech3" />
+      <axis
+        xyz="0 0 0" />
+    </joint>
+  </xacro:macro>
+</robot>

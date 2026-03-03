@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
+  <name>bota_driver_example</name>
+  <version>1.0.0</version>
+  <description>Example package that shows how to use the bota_driver_node from bota_driver package to build a robotic application using Bota Systems FT sensors</description>
+  <maintainer email="support@botasys.com">Bota Systems AG</maintainer>
+  <license>BSL</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <!-- Bota Driver Package -->
+  <depend>bota_driver</depend>
+
+  <!-- Core dependencies -->
+  <depend>rclcpp</depend>
+  <depend>std_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>xacro</depend>
+  <depend>launch</depend>
+  <depend>launch_ros</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+
+  <!-- Rviz visualization -->
+  <exec_depend>rviz2</exec_depend>
+
+  <!-- For orientation estimation -->
+  <exec_depend>imu_filter_madgwick</exec_depend>
+
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>
+

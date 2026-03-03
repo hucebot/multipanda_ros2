@@ -1,0 +1,84 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro" name="bota_ft_sensor_mounted">
+
+    <!--#######################################-->
+    <!-- //////// Robot description ////////// -->
+    <!--#######################################-->
+
+    <!-- This is a place holder for the robot link onto which the sensor is attached-->
+    <link name="robot_mounting_link" />
+
+    <!--####################################################-->
+    <!-- //////// Bota FT Sensor Links and Joint ////////// -->
+    <!--####################################################-->
+
+    <!-- Define the prefix for the sensor link name -->
+    <xacro:arg name="bota_ft_sensor_link_name" default="bota_ft_sensor" />
+
+    <!-- Include and use the sensor links and joints xacro from the bota_driver package || UNCOMMENT THE ONE IN USE -->
+
+    <!-- SensONE GEN0 Serial -->
+    <!-- <xacro:include filename="$(find bota_driver)/urdf/BFT_SENS_SER_M8.urdf.xacro" /> -->
+    <!-- <xacro:BFT_SENS_SER_M8 prefix="$(arg bota_ft_sensor_link_name)" /> -->
+
+    <!-- SensONE GEN0 EtherCAT -->
+    <!-- <xacro:include filename="$(find bota_driver)/urdf/BFT_SENS_ECAT_M8.urdf.xacro" /> -->
+    <!-- <xacro:BFT_SENS_ECAT_M8 prefix="$(arg bota_ft_sensor_link_name)" /> -->
+
+    <!-- Rokubi GEN0 Serial -->
+    <!-- <xacro:include filename="$(find bota_driver)/urdf/BFT_ROKS_SER_M8.urdf.xacro" /> -->
+    <!-- <xacro:BFT_ROKS_SER_M8 prefix="$(arg bota_ft_sensor_link_name)" /> -->
+
+    <!-- Rokubi GEN0 EtherCAT -->
+    <!-- <xacro:include filename="$(find bota_driver)/urdf/BFT_ROKS_ECAT_M8.urdf.xacro" /> -->
+    <!-- <xacro:BFT_ROKS_ECAT_M8 prefix="$(arg bota_ft_sensor_link_name)" /> -->
+
+    <!-- Medusa GEN0 Serial -->
+    <!-- <xacro:include filename="$(find bota_driver)/urdf/BFT_MEDS_SER_M8.urdf.xacro" /> -->
+    <!-- <xacro:BFT_MEDS_SER_M8 prefix="$(arg bota_ft_sensor_link_name)" /> -->
+
+    <!-- Medusa GEN0 EtherCAT -->
+    <!-- <xacro:include filename="$(find bota_driver)/urdf/BFT_MEDS_ECAT_M8.urdf.xacro" /> -->
+    <!-- <xacro:BFT_MEDS_ECAT_M8 prefix="$(arg bota_ft_sensor_link_name)" /> -->
+
+    <!-- MiniONE Pro GEN0 Serial -->
+    <!-- <xacro:include filename="$(find bota_driver)/urdf/BFT_MIPS_SER_CG.urdf.xacro" /> -->
+    <!-- <xacro:BFT_MIPS_SER_CG prefix="$(arg bota_ft_sensor_link_name)" /> -->
+
+    <!-- MiniONE Pro GEN0 EtherCAT -->
+    <!-- <xacro:include filename="$(find bota_driver)/urdf/BFT_MIPS_ECAT_CG.urdf.xacro" /> -->
+    <!-- <xacro:BFT_MIPS_ECAT_CG prefix="$(arg bota_ft_sensor_link_name)" /> -->
+
+    <!-- LaxONE GEN0 Serial -->
+    <!-- <xacro:include filename="$(find bota_driver)/urdf/BFT_LAXS_SER_M8.urdf.xacro" /> -->
+    <!-- <xacro:BFT_LAXS_SER_M8 prefix="$(arg bota_ft_sensor_link_name)" /> -->
+
+    <!-- LaxONE GEN0 EtherCAT -->
+    <!-- <xacro:include filename="$(find bota_driver)/urdf/BFT_LAXS_ECAT_M8.urdf.xacro" /> -->
+    <!-- <xacro:BFT_LAXS_ECAT_M8 prefix="$(arg bota_ft_sensor_link_name)" />     -->
+
+    <!-- MegaONE GEN0 Serial -->
+    <xacro:include filename="$(find bota_driver)/urdf/BFT_MEGS_SER_M8.urdf.xacro" />
+    <xacro:BFT_MEGS_SER_M8 prefix="$(arg bota_ft_sensor_link_name)" />
+
+    <!-- MegaONE GEN0 EtherCAT -->
+    <!-- <xacro:include filename="$(find bota_driver)/urdf/BFT_MEGS_ECAT_M8.urdf.xacro" />
+    <xacro:BFT_MEGS_ECAT_M8 prefix="$(arg bota_ft_sensor_link_name)" />    -->
+
+    <!-- Kinova Gen3 -->
+    <!-- <xacro:include filename="$(find bota_driver)/urdf/BFT_KG3_IND2_SW.urdf.xacro" />
+    <xacro:BFT_KG3_IND2_SW prefix="$(arg bota_ft_sensor_link_name)" />    -->
+
+
+    <!--##########################################################-->
+    <!-- //////// Connection Robot with Bota FT Sensor ////////// -->
+    <!--##########################################################-->
+
+    <!-- Define the mounting joint for the sensor -->
+    <joint name="robot_mounting_link_to_bota_ft_sensor" type="fixed">
+        <parent link="robot_mounting_link" />
+        <child link = "$(arg bota_ft_sensor_link_name)_mounting" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+    </joint>
+    
+</robot>

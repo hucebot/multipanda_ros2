@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-1-g15f4949  Build Version: 1.6.7594.29634
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:macro name="BFT_ROKS_SER_M8" params="prefix">
+    <link
+      name="${prefix}_mounting">
+      <inertial>
+        <origin
+          xyz="-2.2475E-05 0.00127 0.014438"
+          rpy="0 0 0" />
+        <mass
+          value="0.068987" />
+        <inertia
+          ixx="1.7966E-05"
+          ixy="-2.0386E-08"
+          ixz="7.7509E-09"
+          iyy="1.7744E-05"
+          iyz="-1.1863E-08"
+          izz="2.7696E-05" />
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://bota_driver/meshes/BFT_ROKS_M8/mounting.STL" />
+        </geometry>
+        <material
+          name="Bota_material">
+          <color
+            rgba="0.89804 0.91765 0.92941 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin
+          xyz="0 0 0.0155"
+          rpy="0 0 0" />
+        <geometry>
+          <cylinder radius="0.024" length="0.031"/>
+        </geometry>
+      </collision>
+      <collision>
+        <origin
+          xyz="0 0.028 0.0135"
+          rpy="0 0 0" />
+        <geometry>
+          <box size="0.018 0.015 0.027" />
+        </geometry>
+      </collision>
+      <collision>
+        <origin
+          xyz="0 0.0515 0.0135"
+          rpy="1.57 0 0" />
+        <geometry>
+          <cylinder radius="0.0065" length="0.032"/>
+        </geometry>
+      </collision>
+    </link>
+    <link
+      name="${prefix}_wrench">
+      <inertial>
+        <origin
+          xyz="-1.6253E-08 6.5136E-06 -0.0075009"
+          rpy="0 0 0" />
+        <mass
+          value="0.028727" />
+        <inertia
+          ixx="3.2695E-06"
+          ixy="9.1326E-13"
+          ixz="-1.2355E-12"
+          iyy="3.2665E-06"
+          iyz="-3.9713E-10"
+          izz="5.081E-06" />
+      </inertial>
+      <visual>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh
+            filename="package://bota_driver/meshes/BFT_ROKS_M8/wrench.STL" />
+        </geometry>
+        <material
+          name="Bota_material">
+          <color
+            rgba="0.6902 0.61176 0.52941 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin
+          xyz="0 0 -0.009"
+          rpy="0 0 0" />
+        <geometry>
+          <cylinder radius="0.019" length="0.018"/>
+        </geometry>
+      </collision>
+    </link>
+    <joint
+      name="${prefix}_mounting_to_wrench"
+      type="fixed">
+      <origin
+        xyz="0 0 0.032"
+        rpy="0 0 0" />
+      <parent
+        link="${prefix}_mounting" />
+      <child
+        link="${prefix}_wrench" />
+      <axis
+        xyz="0 0 0" />
+    </joint>
+  </xacro:macro>
+</robot>

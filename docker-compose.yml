@@ -20,6 +20,10 @@ services:
     network_mode: host
     devices:
       - "/dev/dri:/dev/dri"
+      - "/dev/ttyUSB0:/dev/ttyUSB0"
+    privileged: true
+    group_add:
+      - dialout
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - /tmp/.docker.xauth:/tmp/.docker.xauth:rw
@@ -28,3 +32,5 @@ services:
       - ./franka_simple_publishers:/home/user/humble_ws/src/bimanual_architecture/franka_simple_publishers
       - ./franka_description:/home/user/humble_ws/src/bimanual_architecture/franka_description
       - ./franka_move_linear:/home/user/humble_ws/src/bimanual_architecture/franka_move_linear
+      - ./bota_driver_ros2:/home/user/humble_ws/src/bimanual_architecture/bota_driver_ros2
+      - ./bota_driver_ros2_example:/home/user/humble_ws/src/bimanual_architecture/bota_driver_ros2_example

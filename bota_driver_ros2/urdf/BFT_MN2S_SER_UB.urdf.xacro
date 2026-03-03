@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<robot xmlns:xacro="http://wiki.ros.org/xacro">
+  <xacro:macro name="BFT_MN2S_SER_UB" params="prefix">
+
+    <link
+      name="${prefix}_mounting">
+      <inertial>
+        <origin
+          xyz="0.0 0.0 0.0"
+          rpy="0 0 0" />
+        <mass
+          value="0.1" />
+        <inertia
+          ixx="1E-05"
+          ixy="1E-07"
+          ixz="1E-08"
+          iyy="1E-05"
+          iyz="1E-08"
+          izz="1E-08" />
+      </inertial>
+      <visual>
+        <origin
+          xyz="-0.0285 -0.0205 0.0"
+          rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://bota_driver/meshes/BFT_MN2S_SER_UB/mounting.STL" />
+        </geometry>
+        <material
+          name="">
+          <color
+            rgba="0.6902 0.61176 0.52941 1" />
+        </material>
+      </visual>
+      <collision>
+        <origin
+          xyz="0 0 0"
+          rpy="0 0 0" />
+        <geometry>
+          <cylinder radius="0.035" length="0.028"/>
+        </geometry>
+      </collision>
+    </link>
+
+    <link
+      name="${prefix}_wrench">
+      <inertial>
+        <origin
+          xyz="0.0 0.0 0.0"
+          rpy="0 0 0" />
+        <mass
+          value="0.1" />
+        <inertia
+          ixx="1E-05"
+          ixy="1E-07"
+          ixz="1E-07"
+          iyy="1E-05"
+          iyz="1E-07"
+          izz="1E-05"/>
+      </inertial>
+    </link>
+
+    <joint
+      name="${prefix}_mounting_to_wrench"
+      type="fixed">
+      <origin
+        xyz="0 0 0.0235"
+        rpy="0 0 0" />
+      <parent
+        link="${prefix}_mounting" />
+      <child
+        link="${prefix}_wrench" />
+      <axis
+        xyz="0 0 0" />
+    </joint>
+  </xacro:macro>
+</robot>

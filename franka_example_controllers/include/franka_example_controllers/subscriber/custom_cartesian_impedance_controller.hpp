@@ -8,7 +8,6 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 #include <geometry_msgs/msg/pose_stamped.hpp>
-#include <geometry_msgs/msg/wrench_stamped.hpp>
 #include "franka_semantic_components/franka_robot_model.hpp"
 
 using CallbackReturn = rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn;
@@ -62,8 +61,6 @@ class CustomCartesianImpedanceController : public controller_interface::Controll
   Vector7d q_;
   Vector7d dq_;
   Vector7d tau_J_d_;
-  Vector6d f_ext_cart_;
-  Vector6d f_ext_cart_prev;
 
   double filter_params_{0.008}; // 0.008
   const double delta_tau_max_{0.5};
@@ -98,7 +95,6 @@ class CustomCartesianImpedanceController : public controller_interface::Controll
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr cartesian_pos_des_filt_pub_;
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr cartesian_pos_curr_pub_;
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;
-  rclcpp::Publisher<geometry_msgs::msg::WrenchStamped>::SharedPtr f_ext_cart_pub_;
 };
 
 }  // namespace franka_example_controllers
