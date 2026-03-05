@@ -321,6 +321,10 @@ void CustomCartesianImpedanceController::publishData() {
     msgJointState.velocity[i] = dq_[i];
     msgJointState.effort[i] = tau_J_d_[i];
   }
+
+  cartesian_pos_des_filt_pub_->publish(msgCartPosDesFilt);
+  cartesian_pos_curr_pub_->publish(msgCartPosCurr);
+  joint_state_pub_->publish(msgJointState);
 }
 
 }  // namespace franka_example_controllers

@@ -53,18 +53,12 @@ controller_interface::return_type MoveToStartExampleController::update(
   auto motion_generator_output = motion_generator_->getDesiredJointPositions(trajectory_time);
   Vector7d q_desired = motion_generator_output.first;
   bool finished = motion_generator_output.second;
-  if (not finished) {
-    const double kAlpha = 0.99;
-    dq_filtered_ = (1 - kAlpha) * dq_filtered_ + kAlpha * dq_;
-    Vector7d tau_d_calculated =
-        k_gains_.cwiseProduct(q_desired - q_) + d_gains_.cwiseProduct(-dq_filtered_);
-    for (int i = 0; i < 7; ++i) {
-      command_interfaces_[i].set_value(tau_d_calculated(i));
-    }
-  } else {
-    for (auto& command_interface : command_interfaces_) {
-      command_interface.set_value(0);
-    }
+  const double kAlpha = 0.99;
+  dq_filtered_ = (1 - kAlpha) * dq_filtered_ + kAlpha * dq_;
+  Vector7d tau_d_calculated =
+      k_gains_.cwiseProduct(q_desired - q_) + d_gains_.cwiseProduct(-dq_filtered_);
+  for (int i = 0; i < 7; ++i) {
+    command_interfaces_[i].set_value(tau_d_calculated(i));
   }
   return controller_interface::return_type::OK;
 }
