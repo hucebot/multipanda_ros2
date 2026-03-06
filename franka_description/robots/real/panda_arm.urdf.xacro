@@ -2,6 +2,8 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="panda">
   <xacro:arg name="arm_id" default="panda"/> <!-- Name of this panda -->
   <xacro:arg name="hand" default="false"/> <!-- Should a franka_gripper be mounted at the flange?" -->
+  <xacro:arg name="fts" default="false"/> <!-- Should a fts sensor be mounted?" -->
+  <xacro:arg name="fts_link_name" default="bota_ft_sensor"/> <!-- fts link name" -->
   <xacro:arg name="robot_ip" default=""/> <!-- IP address or hostname of the robot" -->
   <xacro:arg name="use_fake_hardware" default="false"/>
   <xacro:arg name="fake_sensor_commands" default="false"/>
@@ -9,10 +11,37 @@
   <xacro:include filename="$(find franka_description)/robots/common/panda_arm.xacro"/>
   <xacro:panda_arm arm_id="$(arg arm_id)" safety_distance="0.03"/>
 
-  <xacro:if value="$(arg hand)">
+  <xacro:property name="has_fts" value="${'$(arg fts)' == 'true'}" />
+  <xacro:property name="has_hand" value="${'$(arg hand)' == 'true'}" />   
+
+  <xacro:if value="${not has_fts and has_hand}">
     <xacro:include filename="$(find franka_description)/robots/common/hand.xacro"/>
     <xacro:hand ns="$(arg arm_id)" rpy="0 0 ${-pi/4}" connected_to="$(arg arm_id)_link8" safety_distance="0.03"/>
   </xacro:if>
+
+  <xacro:if value="${has_fts and not has_hand}">
+    <xacro:include filename="$(find franka_description)/robots/common/BFT_SENS_SER_M8.urdf.xacro"/>
+    <xacro:BFT_SENS_SER_M8 prefix="$(arg fts_link_name)" />
+    <joint name="fts_to_robot" type="fixed">
+      <parent link="$(arg arm_id)_link8" />
+      <child link="$(arg fts_link_name)_mounting" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+  </xacro:if>
+
+  <xacro:if value="${has_fts and has_hand}">
+    <xacro:include filename="$(find franka_description)/robots/common/BFT_SENS_SER_M8.urdf.xacro"/>
+    <xacro:include filename="$(find franka_description)/robots/common/hand.xacro"/>
+    <xacro:BFT_SENS_SER_M8 prefix="$(arg fts_link_name)" />
+    <joint name="fts_to_robot" type="fixed">
+      <parent link="$(arg arm_id)_link8" />
+      <child link="$(arg fts_link_name)_mounting" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
+    <xacro:hand ns="$(arg arm_id)" rpy="0 0 ${-pi/4}" connected_to="$(arg fts_link_name)_wrench" safety_distance="0.03"/>
+  </xacro:if>
+
   <xacro:include filename="$(find franka_description)/robots/real/panda_arm.ros2_control.xacro"/>
   <xacro:panda_arm_ros2_control ns="$(arg arm_id)" robot_ip="$(arg robot_ip)" use_fake_hardware="$(arg use_fake_hardware)" fake_sensor_commands="$(arg fake_sensor_commands)"/>
 </robot>
+

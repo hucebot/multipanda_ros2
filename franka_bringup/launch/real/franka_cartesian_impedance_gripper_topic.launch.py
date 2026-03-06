@@ -33,10 +33,14 @@ from launch.substitutions import (
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 
+from launch_ros.parameter_descriptions import ParameterValue
+
 
 def generate_launch_description():
     robot_ip_parameter_name = "robot_ip"
     load_gripper_parameter_name = "load_gripper"
+    load_fts_parameter_name = 'load_fts'
+    fts_sensor_link_name_parameter = "fts_sensor_link_name"
     use_fake_hardware_parameter_name = "use_fake_hardware"
     fake_sensor_commands_parameter_name = "fake_sensor_commands"
     use_rviz_parameter_name = "use_rviz"
@@ -49,9 +53,11 @@ def generate_launch_description():
     default_epsilon_inner_parameter_name = "default_epsilon_inner"
     default_epsilon_outer_parameter_name = "default_epsilon_outer"
     pub_frequency_parameter_name = "pub_frequency"
-
+    
     robot_ip = LaunchConfiguration(robot_ip_parameter_name)
     load_gripper = LaunchConfiguration(load_gripper_parameter_name)
+    load_fts = LaunchConfiguration(load_fts_parameter_name)
+    fts_sensor_link_name = LaunchConfiguration(fts_sensor_link_name_parameter)
     use_fake_hardware = LaunchConfiguration(use_fake_hardware_parameter_name)
     fake_sensor_commands = LaunchConfiguration(
         fake_sensor_commands_parameter_name
@@ -92,6 +98,10 @@ def generate_launch_description():
             franka_xacro_file,
             " hand:=",
             load_gripper,
+            " fts:=",
+            load_fts,
+            " fts_link_name:=",
+            fts_sensor_link_name,
             " robot_ip:=",
             robot_ip,
             " use_fake_hardware:=",
@@ -156,6 +166,16 @@ def generate_launch_description():
                 "without an end-effector.",
             ),
             DeclareLaunchArgument(
+                load_fts_parameter_name,
+                default_value='false',
+                description='Use fts if true. Robot is loaded without fts otherwise'
+            ),
+            DeclareLaunchArgument(
+                fts_sensor_link_name_parameter,
+                default_value='bota_ft_sensor',
+                description='Prefix for the FT sensor link name'
+            ),
+            DeclareLaunchArgument(
                 gripper_max_width_parameter_name,
                 default_value="0.074",
                 description="Maximum gripper width opening in meters.",
@@ -195,7 +215,8 @@ def generate_launch_description():
                 executable="robot_state_publisher",
                 name="robot_state_publisher",
                 output="screen",
-                parameters=[{"robot_description": robot_description}],
+                # parameters=[{"robot_description": robot_description}],
+                parameters=[{'robot_description': ParameterValue(robot_description, value_type=str)}]
             ),
             Node(
                 package="joint_state_publisher",
@@ -279,6 +300,17 @@ def generate_launch_description():
                 name="rviz2",
                 arguments=["--display-config", rviz_file],
                 condition=IfCondition(use_rviz),
+            ),
+            Node(
+                package="bota_driver",
+                executable="bota_driver_node",
+                output="screen",
+                parameters=[{
+                    'node_name': fts_sensor_link_name, # Set node name to match sensor link name
+                    'config_file': os.path.join(get_package_share_directory('bota_driver_example'),'bota_config','bota_binary_gen0.json'),
+                    'output_rate': 90.0,
+                }],
+                condition=IfCondition(load_fts),
             ),
             # launch file already present in the franka_gripper_custom, use that
             IncludeLaunchDescription(
