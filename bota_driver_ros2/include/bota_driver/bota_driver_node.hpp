@@ -6,6 +6,8 @@
 #include <string>
 #include <thread>
 #include <atomic>
+#include <array>
+#include <mutex>
 
 #include "rclcpp/rclcpp.hpp"
 #include "geometry_msgs/msg/wrench_stamped.hpp"
@@ -64,6 +66,11 @@ private:
 
   // Node name used for topic and service prefixes
   std::string bota_driver_node_name_;
+
+  // Bota FT sensor variables
+  std::mutex filter_mutex_; // to protect array
+  std::array<double, 6> fil_sensor_wrench_ = {0.0, 0.0, 0.0, 0.0, 0.0, 0.0};
+  double sensor_wrench_filter_alpha_{0.3}; // Low pass filter for the raw force reading (1.0 means no filtering)
 };
 
 #endif // BOTA_DRIVER_NODE_HPP
