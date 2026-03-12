@@ -11,6 +11,7 @@ services:
       - QT_X11_NO_MITSHM=1
       - RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
       - ROS_DOMAIN_ID=39
+      - CYCLONEDDS_URI=file:///etc/ros2/cyclonedds.xml
     cap_add:
       - SYS_NICE
     ulimits:
@@ -34,3 +35,4 @@ services:
       - ./franka_move_linear:/home/user/humble_ws/src/bimanual_architecture/franka_move_linear
       - ./bota_driver_ros2:/home/user/humble_ws/src/bimanual_architecture/bota_driver_ros2
       - ./bota_driver_ros2_example:/home/user/humble_ws/src/bimanual_architecture/bota_driver_ros2_example
+      - ./cyclonedds.xml:/etc/ros2/cyclonedds.xml

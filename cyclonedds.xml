@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<CycloneDDS xmlns="https://cyclonedds.org/schema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://cyclonedds.org/schema https://cyclonedds.org/schema/cyclonedds.xsd">
+    <Domain id="any">
+        <General>
+            <NetworkInterfaceAddress>enp1s0</NetworkInterfaceAddress>
+            <AllowMulticast>true</AllowMulticast>    
+        </General>
+    </Domain>
+</CycloneDDS>
