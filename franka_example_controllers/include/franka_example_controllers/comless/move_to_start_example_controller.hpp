@@ -21,7 +21,7 @@
 #include <controller_interface/controller_interface.hpp>
 #include <rclcpp/rclcpp.hpp>
 
-#include "custom_msgs/msg/gripper_width.hpp"
+#include <geometry_msgs/msg/point_stamped.hpp>
 
 #include "motion_generator.hpp"
 
@@ -52,7 +52,7 @@ class MoveToStartExampleController : public controller_interface::ControllerInte
   Vector7d d_gains_;
   rclcpp::Time start_time_;
   std::unique_ptr<MotionGenerator> motion_generator_;
-  rclcpp::Publisher<custom_msgs::msg::GripperWidth>::SharedPtr gripper_action_pub_;
+  rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr gripper_action_pub_;
 
   void updateJointStates();
 };

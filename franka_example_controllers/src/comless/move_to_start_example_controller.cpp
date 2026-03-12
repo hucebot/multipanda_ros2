@@ -106,7 +106,7 @@ CallbackReturn MoveToStartExampleController::on_configure(
   dq_filtered_.setZero();
 
   // CREATE PUBLISHER
-  gripper_action_pub_ = get_node()->create_publisher<custom_msgs::msg::GripperWidth>("/panda_gripper/gripper_command", 10);
+  gripper_action_pub_ = get_node()->create_publisher<geometry_msgs::msg::PointStamped>("/panda_gripper/gripper_command", 10);
 
   return CallbackReturn::SUCCESS;
 }
@@ -116,9 +116,9 @@ CallbackReturn MoveToStartExampleController::on_activate(
   updateJointStates();
 
   // SEND GRIPPER COMMAND
-  custom_msgs::msg::GripperWidth msg;
+  geometry_msgs::msg::PointStamped msg;
   msg.header.stamp = this->get_node()->now();
-  msg.width = 0.0;  // OPEN
+  msg.point.x = 0.0; // OPEN
 
   gripper_action_pub_->publish(msg);
 

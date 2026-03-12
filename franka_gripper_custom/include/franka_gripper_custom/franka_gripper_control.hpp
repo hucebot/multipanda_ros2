@@ -5,7 +5,7 @@
 
 #include <franka/exception.h>
 #include <franka/gripper.h>
-#include <custom_msgs/msg/gripper_width.hpp>
+#include <geometry_msgs/msg/point_stamped.hpp>
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/joint_state.hpp>
 
@@ -28,11 +28,11 @@ class GripperSubscriber : public rclcpp::Node {
   bool command_data_bool_prev;
 
   // ROS2 subscription
-  rclcpp::Subscription<custom_msgs::msg::GripperWidth>::SharedPtr command_sub_;
+  rclcpp::Subscription<geometry_msgs::msg::PointStamped>::SharedPtr command_sub_;
 
   // ROS2 publishers
   rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr joint_state_pub_;
-  rclcpp::Publisher<custom_msgs::msg::GripperWidth>::SharedPtr width_pub_;
+  rclcpp::Publisher<geometry_msgs::msg::PointStamped>::SharedPtr width_pub_;
 
   // Timer for periodic state publishing
   rclcpp::TimerBase::SharedPtr timer_;
@@ -49,6 +49,6 @@ class GripperSubscriber : public rclcpp::Node {
   int pub_frequency_;
 
   // Callback function executed when a message is received
-  void commandCallback(const custom_msgs::msg::GripperWidth::SharedPtr msg);
+  void commandCallback(const geometry_msgs::msg::PointStamped::SharedPtr msg);
   void publishGripperState();
 };
