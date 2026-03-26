@@ -33,7 +33,7 @@ GripperSubscriber::GripperSubscriber() : Node("panda_gripper") {
   }
 
   // Subscriber
-  command_sub_ = this->create_subscription<custom_msgs::msg::GripperWidth>(
+  command_sub_ = this->create_subscription<geometry_msgs::msg::PointStamped>(
       "~/gripper_command", 1,
       std::bind(&GripperSubscriber::commandCallback, this, std::placeholders::_1));
 
@@ -41,7 +41,7 @@ GripperSubscriber::GripperSubscriber() : Node("panda_gripper") {
   joint_state_pub_ =
       this->create_publisher<sensor_msgs::msg::JointState>("~/joint_states", 10);  // joint states
   width_pub_ =
-      this->create_publisher<custom_msgs::msg::GripperWidth>("~/width", 10);  // gripper width
+      this->create_publisher<geometry_msgs::msg::PointStamped>("~/width", 10);  // gripper width
 
   // Timer for publishing state
   timer_ = this->create_wall_timer(std::chrono::milliseconds(1000 / pub_frequency_),
@@ -52,9 +52,9 @@ GripperSubscriber::GripperSubscriber() : Node("panda_gripper") {
   command_data_bool_prev = false;
 }
 
-void GripperSubscriber::commandCallback(const custom_msgs::msg::GripperWidth::SharedPtr msg) {
+void GripperSubscriber::commandCallback(const geometry_msgs::msg::PointStamped::SharedPtr msg) {
   // get data
-  double command_data = msg->width;
+  double command_data = msg->point.x;
   bool command_data_bool = (command_data >= 0.5);
 
   // decide whether to open or close
@@ -103,9 +103,9 @@ void GripperSubscriber::publishGripperState() {
   joint_state_pub_->publish(joint_states);
 
   // Publish width
-  custom_msgs::msg::GripperWidth width_msg;
+  geometry_msgs::msg::PointStamped width_msg;
   width_msg.header.stamp = this->get_clock()->now();
-  width_msg.width = current_gripper_state_.width;
+  width_msg.point.x = current_gripper_state_.width;
   width_pub_->publish(width_msg);
 }
 

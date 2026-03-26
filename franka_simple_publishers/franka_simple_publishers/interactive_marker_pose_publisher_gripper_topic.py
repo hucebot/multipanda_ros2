@@ -7,8 +7,7 @@ from rclpy.callback_groups import ReentrantCallbackGroup
 from visualization_msgs.msg import InteractiveMarker, InteractiveMarkerControl, InteractiveMarkerFeedback, Marker
 from interactive_markers.interactive_marker_server import InteractiveMarkerServer
 from interactive_markers.menu_handler import MenuHandler
-from geometry_msgs.msg import PoseStamped
-from custom_msgs.msg import GripperWidth
+from geometry_msgs.msg import PoseStamped, PointStamped
 
 from tf2_ros import TransformListener, Buffer, LookupException, TimeoutException
 
@@ -40,15 +39,15 @@ class EndEffectorMarkerNode(Node):
             PoseStamped, self.eq_pose_topic_name, 1, callback_group=self.callback_group
         )
         self.gripper_pub = self.create_publisher(
-            GripperWidth, self.gripper_topic_name, 1, callback_group=self.callback_group
+            PointStamped, self.gripper_topic_name, 1, callback_group=self.callback_group
         )
 
         # Gripper cmd msgs
-        self.grasp_msg = GripperWidth()
-        self.grasp_msg.width = 1.0
+        self.grasp_msg = PointStamped()
+        self.grasp_msg.point.x = 1.0
         self.grasp_msg.header.frame_id = self.ee_link
-        self.open_msg = GripperWidth()
-        self.open_msg.width = 0.0
+        self.open_msg = PointStamped()
+        self.open_msg.point.x = 0.0
         self.open_msg.header.frame_id = self.ee_link
 
         # TF buffer and listener

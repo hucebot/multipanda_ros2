@@ -3,8 +3,7 @@
 import rclpy
 from rclpy.node import Node
 
-from geometry_msgs.msg import PoseStamped
-from custom_msgs.msg import GripperWidth
+from geometry_msgs.msg import PoseStamped, PointStamped
 
 import numpy as np
 
@@ -57,7 +56,7 @@ class MoveLinear(Node):
         # Publisher
 
         self.cart_pose_action_pub = self.create_publisher(PoseStamped, '/cartesian_impedance/equilibrium_pose', 10)
-        self.gripper_action_pub = self.create_publisher(GripperWidth, '/panda_gripper/gripper_command', 10)
+        self.gripper_action_pub = self.create_publisher(PointStamped, '/panda_gripper/gripper_command', 10)
 
         # Timer according to framerate
         self.dt_timer = 1.0 / self.fps_timer
@@ -90,9 +89,9 @@ class MoveLinear(Node):
         self.interp_init(self.cart_pos_curr, self.cart_quat_curr, self.cart_pos_target, self.cart_quat_target)
 
         # Publish gripper open (just one time)
-        gripper_msg = GripperWidth()
+        gripper_msg = PointStamped()
         gripper_msg.header.stamp = self.get_clock().now().to_msg()
-        gripper_msg.width = 0.0 # OPEN
+        gripper_msg.point.x = 0.0 # OPEN
 
         # Publish
         self.gripper_action_pub.publish(gripper_msg)
