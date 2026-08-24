@@ -21,6 +21,8 @@ from launch.actions import (
     DeclareLaunchArgument,
     IncludeLaunchDescription,
     Shutdown,
+    ExecuteProcess, 
+    TimerAction
 )
 from launch.conditions import IfCondition, UnlessCondition
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -311,6 +313,32 @@ def generate_launch_description():
                     'output_rate': 90.0,
                 }],
                 condition=IfCondition(load_fts),
+            ),
+            Node(
+                package="franka_simple_publishers",
+                executable="bota_deadband_filter",
+                name="bota_deadband_filter",
+                output="screen",
+                parameters=[{
+                    'input_topic': [fts_sensor_link_name, '/wrench'],
+                    'output_topic': [fts_sensor_link_name, '/wrench_filtered'],
+                }],
+                condition=IfCondition(load_fts),
+            ),
+            # Call taring service for fts
+            TimerAction(
+                period=3.0,  # Wait 3 seconds for the Bota driver to fully start
+                actions=[
+                    ExecuteProcess(
+                        cmd=[
+                            'ros2', 'service', 'call', 
+                            ['/', fts_sensor_link_name, '/tare'], 
+                            'std_srvs/srv/Trigger'
+                        ],
+                        output='screen',
+                        condition=IfCondition(load_fts),
+                    )
+                ]
             ),
             # launch file already present in the franka_gripper_custom, use that
             IncludeLaunchDescription(

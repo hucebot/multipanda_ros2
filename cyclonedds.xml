@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<CycloneDDS xmlns="https://cyclonedds.org/schema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://cyclonedds.org/schema https://cyclonedds.org/schema/cyclonedds.xsd">
+<CycloneDDS xmlns="https://cdds.io/config" 
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+            xsi:schemaLocation="https://cdds.io/config https://raw.githubusercontent.com/eclipse-cyclonedds/cyclonedds/master/etc/cyclonedds.xsd">
     <Domain id="any">
         <General>
-            <NetworkInterfaceAddress>enp1s0</NetworkInterfaceAddress>
+            <Interfaces>
+                <NetworkInterface name="enp1s0" />
+            </Interfaces>
             <AllowMulticast>true</AllowMulticast>    
         </General>
+        <Discovery>
+            <Peers>
+                <Peer address="176.16.0.1"/>
+                <!-- <Peer address="192.168.1.2"/> -->
+                <Peer address="192.168.1.1"/>
+                <Peer address="192.168.1.42"/>
+            </Peers>
+            <ParticipantIndex>auto</ParticipantIndex>
+            <MaxAutoParticipantIndex>200</MaxAutoParticipantIndex>
+        </Discovery>
     </Domain>
 </CycloneDDS>

@@ -134,16 +134,6 @@ void BotaDriverNode::publish_frame_data(const bota::BotaFrame &frame)
   // Protect from race conditions
   std::lock_guard<std::mutex> lock(filter_mutex_);
 
-  // Apply low-pass filtering
-  for (int i = 0; i < 3; ++i)
-  {
-    fil_sensor_wrench_[i] = sensor_wrench_filter_alpha_ * frame.force[i] + (1 - sensor_wrench_filter_alpha_) * fil_sensor_wrench_[i];
-  }
-  for (int i = 0; i < 3; ++i)
-  {
-    fil_sensor_wrench_[i+3] = sensor_wrench_filter_alpha_ * frame.torque[i] + (1 - sensor_wrench_filter_alpha_) * fil_sensor_wrench_[i+3];
-  }
-
   // Get the current time so the topics can be stamped with the same time
   rclcpp::Time stamp = now();
   
@@ -151,12 +141,12 @@ void BotaDriverNode::publish_frame_data(const bota::BotaFrame &frame)
   geometry_msgs::msg::WrenchStamped wrench_msg;
   wrench_msg.header.stamp = stamp;
   wrench_msg.header.frame_id = bota_driver_node_name_ + "_wrench";
-  wrench_msg.wrench.force.x = fil_sensor_wrench_[0];
-  wrench_msg.wrench.force.y = fil_sensor_wrench_[1];
-  wrench_msg.wrench.force.z = fil_sensor_wrench_[2];
-  wrench_msg.wrench.torque.x = fil_sensor_wrench_[3];
-  wrench_msg.wrench.torque.y = fil_sensor_wrench_[4];
-  wrench_msg.wrench.torque.z = fil_sensor_wrench_[5];
+  wrench_msg.wrench.force.x = frame.force[0];
+  wrench_msg.wrench.force.y = frame.force[1];
+  wrench_msg.wrench.force.z = frame.force[2];
+  wrench_msg.wrench.torque.x = frame.torque[0];
+  wrench_msg.wrench.torque.y = frame.torque[1];
+  wrench_msg.wrench.torque.z = frame.torque[2];
   publisher_bota_wrench_->publish(wrench_msg);
 
   // Imu

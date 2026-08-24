@@ -36,6 +36,7 @@ setup(
             'collision_behavior_setter = franka_simple_publishers.collision_behavior_setter:main',
             'assistance_experiment = franka_simple_publishers.assistance_experiment:main',
             'gripper_pose_publisher = franka_simple_publishers.gripper_pose_publisher:main',
+            'bota_deadband_filter = franka_simple_publishers.bota_deadband_filter:main',
         ],
     },
 )
