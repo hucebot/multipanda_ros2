@@ -78,6 +78,11 @@ add_library(multi_mode_controller SHARED
   src/panda_joint_impedance_controller.cpp
   src/panda_joint_velocity_controller.cpp
   src/twin_joint_impedance_controller.cpp)
+# GCC 11 at -O3 (Release) merges the force-law controller's member initialisations into 16-byte aligned stores at
+# offsets that are not 16-byte aligned (its virtual bases), and the controller crashes when it is created
+# (SIGSEGV in Factory::produce<PandaCartesianLawController>, movaps); -O2 does not. Without SLP vectorisation in
+# this one file it is correct at -O3 too (the law is a few hundred operations per tick, no measurable cost).
+set_source_files_properties(src/panda_cartesian_law_controller.cpp PROPERTIES COMPILE_OPTIONS "-fno-tree-slp-vectorize")
 
 target_include_directories(
   multi_mode_controller

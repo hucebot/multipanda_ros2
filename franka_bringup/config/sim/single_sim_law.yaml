@@ -1,0 +1,55 @@
+# The force-law controller in simulation (launch/sim/franka_sim_law.launch.py): the same multi-mode controller and law
+# as config/real/single_law.yaml, MuJoCo's wrist force sensor (panda_ft.xml) in place of the Bota (relayed to
+# /bota_ft_sensor/wrench by scripts/sim_bota.py).
+mujoco_server:
+  ros__parameters:
+    MujocoPlugins:
+      names:
+        - mujoco_ros2_sensors
+        - mujoco_ros2_control
+      mujoco_ros2_sensors:
+        type: mujoco_ros::sensors::MujocoRos2SensorsPlugin
+      mujoco_ros2_control:
+        type: mujoco_ros2_control::MujocoRos2ControlPlugin
+        hardware:
+          type: mujoco_ros_control/RobotHW
+          control_period: 0.001
+        params:
+          namespace: ""
+          robot_description_node: "robot_state_publisher"
+          robot_description: "robot_description"
+
+controller_manager:
+  ros__parameters:
+    update_rate: 1000  # Hz
+
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+
+    multi_mode_controller:
+      type: multi_mode_controller/MultiModeController
+
+joint_state_broadcaster:
+  ros__parameters:
+    frame_id: panda_link0
+    use_local_topics: true
+
+multi_mode_controller:
+  ros__parameters:
+    arm_count: 1
+    arm_1:
+      arm_id: panda
+    controllers: ["panda_joint_impedance_controller", "panda_cartesian_law_controller"]
+    resources:
+        panda_joint_impedance_controller: ["panda"]
+        panda_cartesian_law_controller: ["panda"]
+    start_controllers:
+        names: ["panda_cartesian_law_controller"]
+        resources:
+            panda_cartesian_law_controller: ["panda"]
+    panda_cartesian_law_controller:
+      force_topic: "/bota_ft_sensor/wrench"
+      force_timeout: 0.1
+      # the sensor site sits in panda_hand, turned -45 deg about z from the flange, and the simulated robot's end-effector
+      # pose (O_T_EE) is the flange's (franka_hardware/src/sim/robot_sim.cpp); on the real robot O_T_EE is already the hand
+      sensor_rpy: [0.0, 0.0, -0.7853981633974483]

@@ -34,4 +34,4 @@ multi_mode_controller:
     panda_cartesian_law_controller:
       force_topic: "/bota_ft_sensor/wrench"   # the Bota driver's raw wrench (sensor frame)
       force_timeout: 0.1                      # s: an older force counts as zero
-      sensor_rpy: [0.0, 0.0, 0.0]             # rad: the sensor frame in the flange frame (TO MEASURE before contact)
+      sensor_rpy: [0.0, 0.0, 0.0]             # rad: the sensor frame in the end-effector frame (O_T_EE; TO MEASURE before contact)

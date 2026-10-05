@@ -20,7 +20,7 @@ static auto registration = ControllerFactory::registerClass<Controller>("panda_c
 
 bool Controller::initImpl(const std::vector<RobotData*>&, rclcpp_lifecycle::LifecycleNode::SharedPtr& node,
                           std::string name, std::string) {
-  // where the force comes from and how the sensor is mounted on the flange (roll, pitch, yaw in rad)
+  // where the force comes from and how the sensor is mounted in the end-effector frame (O_T_EE; roll, pitch, yaw in rad)
   const std::string prefix = name + ".";
   if (!node->has_parameter(prefix + "force_topic")) node->declare_parameter(prefix + "force_topic", force_topic_);
   if (!node->has_parameter(prefix + "force_timeout")) node->declare_parameter(prefix + "force_timeout", force_timeout_);
@@ -52,43 +52,49 @@ void Controller::forceCallback(const geometry_msgs::msg::WrenchStamped& msg) {
 
 void Controller::startImpl() {
   law_.setParams(getParametersBuffered().law);
-  law_.reset();  // tares at its first step: start the controller with nothing touching the hand
+  law_.reset();  // tares at its first step with a real reading: start the controller with nothing touching the hand
+  law_started_ = false;
+  tare_raw_.setZero();
   first_tick_ = true;
   tau_prev_.setZero();
 }
 
 void Controller::computeTauImpl(const std::vector<std::array<double, 7>*>& tau, const Pose& desired,
                                 const Params& p) {
-  // time since the last tick (the loop runs at 1 kHz; a late tick still integrates the law correctly)
-  const auto now = std::chrono::steady_clock::now();
-  double dt = 0.001;
-  if (!first_tick_) dt = std::clamp(std::chrono::duration<double>(now - last_tick_).count(), 0.0005, 0.005);
-  last_tick_ = now;
-
   const Pose current = getCurrentPose();
   Eigen::Map<const Matrix7d> inertia(robot_data_[0]->mass().data());
   Eigen::Map<const Vector7d> coriolis(robot_data_[0]->coriolis().data());
   Eigen::Map<const Eigen::Matrix<double, 6, 7>> jacobian(robot_data_[0]->eeZeroJacobian().data());
   Eigen::Map<const Vector7d> qD(robot_data_[0]->state().dq.data());
-  const Eigen::Matrix3d flange = current.orientation.toRotationMatrix();
+  const Eigen::Matrix3d ee_rotation = current.orientation.toRotationMatrix();
 
-  // the wrist force, in the sensor's frame; stale or missing: zero (plain impedance, no push)
-  Vector3d f_raw = Vector3d::Zero();
+  // the wrist force, in the sensor's frame. The law tares at its first step, so it starts only with a real reading.
+  // With no fresh force (none yet, or stale) the law is reset every tick and fed "nothing felt" (the tare reading, not
+  // zero: zero minus the tare would look like the hand's weight pushing): plain impedance, no push (the law alone would
+  // hold its push while nothing moves), the torque rate limit smoothing the drop; when the force is back the law
+  // starts again from the same tare.
+  Vector3d f_raw = tare_raw_;
   {
     std::lock_guard<std::mutex> lock(force_mutex_);
     const bool fresh = has_force_ &&
         (PandaControllerInterface::node_->get_clock()->now() - force_stamp_).seconds() < force_timeout_;
     if (fresh) {
       f_raw = force_;
+      if (!law_started_) {
+        law_.reset();
+        tare_raw_ = force_;
+        law_started_ = true;
+      }
     } else {
+      law_.reset();
       RCLCPP_WARN_THROTTLE(PandaControllerInterface::node_->get_logger(), *PandaControllerInterface::node_->get_clock(),
-                           1000, "panda_cartesian_law_controller: no fresh force on %s, using zero",
+                           1000, "panda_cartesian_law_controller: no fresh force on %s, nothing felt (no push)",
                            force_topic_.c_str());
     }
   }
   law_.setParams(p.law);
   Vector3d target, k, z;
-  law_.step(desired.position, current.position, f_raw, flange * sensor_rotation_, dt, target, k, z);
+  law_.step(desired.position, current.position, f_raw, ee_rotation * sensor_rotation_, CONTROL_PERIOD, target, k, z);
 
   Matrix6d stiffness = Matrix6d::Zero();
   stiffness.diagonal() << k, Vector3d::Constant(p.rot_stiffness);
@@ -107,6 +113,11 @@ void Controller::computeTauImpl(const std::vector<std::array<double, 7>*>& tau, 
   Vector7d tau_nullspace = getDynamicallyConsistentNullspaceProjection<7>(inertia, jacobian) *
       (p.nullspace_stiffness * (desired.q_n - current.q_n) - (2.0 * std::sqrt(p.nullspace_stiffness)) * qD);
   Vector7d tau_d = tau_task + tau_nullspace + coriolis;
+  if (!tau_d.allFinite()) {  // never a non-finite torque: Coriolis only (the robot holds itself against gravity)
+    RCLCPP_ERROR_THROTTLE(PandaControllerInterface::node_->get_logger(), *PandaControllerInterface::node_->get_clock(),
+                          1000, "panda_cartesian_law_controller: non-finite torque, commanding Coriolis only");
+    tau_d = coriolis;
+  }
 
   // safety: the torque changes at most MAX_TORQUE_RATE per tick (the first tick starts from the gravity-free command)
   if (!first_tick_) {
@@ -142,14 +153,22 @@ Controller::Pose Controller::getCurrentPoseImpl() {
 
 bool Controller::desiredPoseCallbackImpl(Pose& p_d, const Pose& p, const GoalMsg& msg) {
   p_d.position = Vector3d(msg.pose.position.x, msg.pose.position.y, msg.pose.position.z);
+  const Eigen::Vector4d q(msg.pose.orientation.w, msg.pose.orientation.x, msg.pose.orientation.y,
+                          msg.pose.orientation.z);
+  if (!p_d.position.allFinite() || !q.allFinite() || std::abs(q.norm() - 1.0) > 0.01 ||
+      !Eigen::Map<const Vector7d>(msg.q_n.data()).allFinite()) {
+    RCLCPP_ERROR_THROTTLE(PandaControllerInterface::node_->get_logger(), *PandaControllerInterface::node_->get_clock(),
+                          1000, "panda_cartesian_law_controller: discarding a planned pose that is not finite or whose "
+                          "quaternion is not unit (norm %.3f)", q.norm());
+    return false;
+  }
   if ((p_d.position - p.position).norm() > 0.1) {
     RCLCPP_WARN_THROTTLE(PandaControllerInterface::node_->get_logger(), *PandaControllerInterface::node_->get_clock(),
                          1000, "panda_cartesian_law_controller: discarding a planned pose %.3f m away (max 0.1 m)",
                          (p_d.position - p.position).norm());
     return false;
   }
-  p_d.orientation = Quaterniond(msg.pose.orientation.w, msg.pose.orientation.x, msg.pose.orientation.y,
-                                msg.pose.orientation.z);
+  p_d.orientation = Quaterniond(q[0], q[1], q[2], q[3]).normalized();
   if (p.orientation.angularDistance(p_d.orientation) > 0.15) {
     RCLCPP_WARN_THROTTLE(PandaControllerInterface::node_->get_logger(), *PandaControllerInterface::node_->get_clock(),
                          1000, "panda_cartesian_law_controller: discarding a planned pose rotated %.3f rad (max 0.15)",

@@ -6,14 +6,14 @@
 // controller applies them (mass-aware damping, sqrtDesign; nullspace; Coriolis). Orientation: fixed impedance.
 //
 // Force: the Bota wrist sensor's WrenchStamped topic (ROS parameter <name>.force_topic, sensor frame), rotated to the
-// base frame with the flange rotation and the sensor's mount rotation (<name>.sensor_rpy). The law tares it at start.
-// A force older than <name>.force_timeout (s) is replaced by zero (plain impedance, no push), with a warning.
+// base frame with the end-effector rotation (O_T_EE) and the sensor's mount rotation (<name>.sensor_rpy). The law tares it at start.
+// The law starts (tares) at the first reading; a force older than <name>.force_timeout (s) then counts as nothing felt
+// (the law reset every tick: plain impedance, no push), with a warning.
 // Safety, as franka_example_controllers' custom Cartesian impedance controller: the torque change per tick is limited.
 // Settings: service <resource>/<name>/parameters (SetForceLaw); defaults: the law ForceVAM's datasets use.
 #include <Eigen/Dense>
 
 #include <atomic>
-#include <chrono>
 #include <mutex>
 
 #include <geometry_msgs/msg/wrench_stamped.hpp>
@@ -43,6 +43,9 @@ class PandaCartesianLawController :
   using GoalMsg = multi_mode_control_msgs::msg::CartesianImpedanceGoal;
   using Service = multi_mode_control_msgs::srv::SetForceLaw;
   static constexpr double MAX_TORQUE_RATE = 1.0;   // N m per tick (1 ms)
+  // one tick = 1 ms of robot time, on the robot (libfranka's 1 kHz loop) and in simulation (one update per 1 ms physics
+  // step, even when the simulation runs slower than real time): the law integrates with it, not with the wall clock
+  static constexpr double CONTROL_PERIOD = 0.001;  // s
   virtual ~PandaCartesianLawController() = default;
 
  private:
@@ -60,7 +63,9 @@ class PandaCartesianLawController :
   void forceCallback(const geometry_msgs::msg::WrenchStamped& msg);
 
   ForceLaw law_;
-  Eigen::Matrix3d sensor_rotation_ = Eigen::Matrix3d::Identity();  // sensor frame -> flange frame
+  bool law_started_ = false;                      // tared with a real reading
+  Eigen::Vector3d tare_raw_ = Eigen::Vector3d::Zero();  // that reading (sensor frame): what "nothing felt" reads
+  Eigen::Matrix3d sensor_rotation_ = Eigen::Matrix3d::Identity();  // sensor frame -> end-effector frame (O_T_EE)
   std::string force_topic_ = "/bota_ft_sensor/wrench";
   double force_timeout_ = 0.1;
   std::mutex force_mutex_;
@@ -68,7 +73,6 @@ class PandaCartesianLawController :
   rclcpp::Time force_stamp_;
   std::atomic<bool> has_force_{false};
   rclcpp::Subscription<geometry_msgs::msg::WrenchStamped>::SharedPtr force_sub_;
-  std::chrono::steady_clock::time_point last_tick_;
   bool first_tick_ = true;
   Eigen::Matrix<double, 7, 1> tau_prev_ = Eigen::Matrix<double, 7, 1>::Zero();
 };
