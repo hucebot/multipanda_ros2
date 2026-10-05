@@ -78,6 +78,10 @@ void Controller::computeTauImpl(const std::vector<std::array<double, 7>*>& tau, 
   // zero: zero minus the tare would look like the hand's weight pushing): plain impedance, no push (the law alone would
   // hold its push while nothing moves), the torque rate limit smoothing the drop; when the force is back the law
   // starts again from the same tare.
+  if (retare_requested_.exchange(false)) {  // SetForceLaw retare: tare again with the next reading
+    law_started_ = false;
+    law_.reset();
+  }
   Vector3d f_raw = tare_raw_;
   {
     std::lock_guard<std::mutex> lock(force_mutex_);
@@ -207,7 +211,8 @@ bool Controller::setParametersCallbackImpl(Params& p_d, const Params&, const Ser
   p_d.rot_stiffness = req->rot_stiffness;
   p_d.rot_damping_ratio = req->rot_damping_ratio;
   p_d.nullspace_stiffness = req->nullspace_stiffness;
+  if (req->retare) retare_requested_ = true;
   res->success = true;
-  res->message = "set";
+  res->message = req->retare ? "set, re-taring" : "set";
   return true;
 }

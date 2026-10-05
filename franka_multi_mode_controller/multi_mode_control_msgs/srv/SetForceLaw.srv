@@ -16,6 +16,8 @@ bool tank                   # energy tank on stiffness increases
 float64 rot_stiffness       # N m/rad, orientation stiffness
 float64 rot_damping_ratio
 float64 nullspace_stiffness
+bool retare                 # re-tare the law with the next reading (nothing may touch the hand), e.g. after the
+                            # sensor's own tare (a tare alone would look like a force to the law)
 ---
 bool success
 string message

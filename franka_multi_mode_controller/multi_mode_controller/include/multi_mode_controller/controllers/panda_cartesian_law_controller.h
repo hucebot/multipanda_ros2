@@ -64,6 +64,7 @@ class PandaCartesianLawController :
 
   ForceLaw law_;
   bool law_started_ = false;                      // tared with a real reading
+  std::atomic<bool> retare_requested_{false};     // SetForceLaw retare: the law tares again with the next reading
   Eigen::Vector3d tare_raw_ = Eigen::Vector3d::Zero();  // that reading (sensor frame): what "nothing felt" reads
   Eigen::Matrix3d sensor_rotation_ = Eigen::Matrix3d::Identity();  // sensor frame -> end-effector frame (O_T_EE)
   std::string force_topic_ = "/bota_ft_sensor/wrench";
