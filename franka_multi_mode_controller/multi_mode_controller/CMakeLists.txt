@@ -34,6 +34,7 @@ rclcpp_lifecycle
 rcutils
 realtime_tools
 sensor_msgs
+geometry_msgs
 Franka
 )
 
@@ -70,6 +71,7 @@ add_library(multi_mode_controller SHARED
   src/comless_panda_joint_impedance_controller.cpp
   src/comless_dual_joint_impedance_controller.cpp
   src/panda_cartesian_impedance_controller.cpp
+  src/panda_cartesian_law_controller.cpp
   src/dual_cartesian_impedance_controller.cpp
   src/twin_cartesian_impedance_controller.cpp
   src/des_coupled_dual_cartesian_impedance_controller.cpp

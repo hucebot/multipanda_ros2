@@ -23,6 +23,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "srv/GetControllers.srv"
   "srv/GetRobotStates.srv"
   "srv/SetCartesianImpedance.srv"
+  "srv/SetForceLaw.srv"
   "srv/SetControllers.srv"
   "srv/SetJointImpedance.srv"
   "srv/SetRecoveryMode.srv"

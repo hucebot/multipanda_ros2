@@ -1,0 +1,21 @@
+# Settings of ForceVAM's force law (panda_cartesian_law_controller, multi_mode_controller/utils/force_law.h).
+# Translations follow the law; orientation and the nullspace keep a fixed impedance.
+float64 k_rest              # N/m, stiffness with no resistance on an axis
+float64 k_load              # N/m, stiffness at 20 N of resistance (linear in between)
+float64 zeta_rest           # damping ratio with no resistance
+float64 zeta_load           # damping ratio at 20 N of resistance
+float64 lead                # the target sits lead x (planned - hand) from the hand
+float64 give                # admittance: mm/s per N beyond 2 N (0: off)
+float64 guard               # N: above it the target stops advancing (0 or less: off)
+float64 tau                 # s, force filter time constant
+float64 push                # N/s, "pull until it gives" growth (0: off)
+float64 push_max            # N, the most the push adds
+float64 k_max               # N/m, stiffness cap (at most 3000, the arm's range)
+float64 zeta_max            # damping ratio cap
+bool tank                   # energy tank on stiffness increases
+float64 rot_stiffness       # N m/rad, orientation stiffness
+float64 rot_damping_ratio
+float64 nullspace_stiffness
+---
+bool success
+string message
