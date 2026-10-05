@@ -26,9 +26,13 @@ bool Controller::initImpl(const std::vector<RobotData*>&, rclcpp_lifecycle::Life
   if (!node->has_parameter(prefix + "force_timeout")) node->declare_parameter(prefix + "force_timeout", force_timeout_);
   if (!node->has_parameter(prefix + "sensor_rpy"))
     node->declare_parameter(prefix + "sensor_rpy", std::vector<double>{0.0, 0.0, 0.0});
+  if (!node->has_parameter(prefix + "force_sign")) node->declare_parameter(prefix + "force_sign", 1.0);
   force_topic_ = node->get_parameter(prefix + "force_topic").as_string();
   force_timeout_ = node->get_parameter(prefix + "force_timeout").as_double();
   const auto rpy = node->get_parameter(prefix + "sensor_rpy").as_double_array();
+  // +1: the sensor reports the force the flange exerts on the hand (the law's convention, MuJoCo's force sensor); -1:
+  // the opposite (a mirror image, which no mount rotation can express). Measured by ros2/tools/ft_calibration.py.
+  force_sign_ = node->get_parameter(prefix + "force_sign").as_double() < 0.0 ? -1.0 : 1.0;
   if (rpy.size() == 3) {
     sensor_rotation_ = (Eigen::AngleAxisd(rpy[2], Vector3d::UnitZ()) * Eigen::AngleAxisd(rpy[1], Vector3d::UnitY()) *
                         Eigen::AngleAxisd(rpy[0], Vector3d::UnitX())).toRotationMatrix();
@@ -40,12 +44,13 @@ void Controller::startROSComImpl() {
   force_sub_ = PandaControllerInterface::node_->create_subscription<geometry_msgs::msg::WrenchStamped>(
       force_topic_, rclcpp::SensorDataQoS(), std::bind(&Controller::forceCallback, this, std::placeholders::_1));
   RCLCPP_INFO(PandaControllerInterface::node_->get_logger(),
-              "panda_cartesian_law_controller: force from %s (timeout %.3f s)", force_topic_.c_str(), force_timeout_);
+              "panda_cartesian_law_controller: force from %s (timeout %.3f s, sign %+.0f)", force_topic_.c_str(),
+              force_timeout_, force_sign_);
 }
 
 void Controller::forceCallback(const geometry_msgs::msg::WrenchStamped& msg) {
   std::lock_guard<std::mutex> lock(force_mutex_);
-  force_ = Vector3d(msg.wrench.force.x, msg.wrench.force.y, msg.wrench.force.z);
+  force_ = force_sign_ * Vector3d(msg.wrench.force.x, msg.wrench.force.y, msg.wrench.force.z);
   force_stamp_ = PandaControllerInterface::node_->get_clock()->now();
   has_force_ = true;
 }

@@ -68,6 +68,7 @@ class PandaCartesianLawController :
   Eigen::Matrix3d sensor_rotation_ = Eigen::Matrix3d::Identity();  // sensor frame -> end-effector frame (O_T_EE)
   std::string force_topic_ = "/bota_ft_sensor/wrench";
   double force_timeout_ = 0.1;
+  double force_sign_ = 1.0;  // the sensor's sign convention (ros2/tools/ft_calibration.py in ForceVAM)
   std::mutex force_mutex_;
   Eigen::Vector3d force_ = Eigen::Vector3d::Zero();
   rclcpp::Time force_stamp_;
